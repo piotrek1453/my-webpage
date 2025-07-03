@@ -11,14 +11,14 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         <!DOCTYPE html>
         <html lang="en">
             <head>
-                <meta charset="utf-8"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <AutoReload options=options.clone() />
-                <HydrationScripts options/>
-                <MetaTags/>
+                <HydrationScripts options />
+                <MetaTags />
             </head>
             <body>
-                <App/>
+                <App />
             </body>
         </html>
     }
@@ -32,29 +32,29 @@ pub fn App() -> impl IntoView {
     view! {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/my-webpage.css"/>
+        <Stylesheet id="leptos" href="/static/style.css" />
 
         // sets the document title
-        <Title text="Welcome to my page!"/>
+        <Title text="Welcome to my page!" />
 
         // content for this welcome page
-        <PageHeader/>
-        <NavBar/>
+        <PageHeader />
+        <NavBar />
 
         <Router>
             <main>
                 <Routes fallback=|| "Page not found.".into_view()>
-                    <Route path=StaticSegment("/") view=HomePage/>
+                    <Route path=StaticSegment("/") view=HomePage />
                     // TODO: implement views for remaining paths
-                    <Route path=StaticSegment("/projects") view=Projects/>
-                    <Route path=StaticSegment("/blog") view=Blog/>
-                    <Route path=StaticSegment("/about") view=About/>
-                    <Route path=StaticSegment("/contact") view=Contact/>
+                    <Route path=StaticSegment("/projects") view=Projects />
+                    <Route path=StaticSegment("/blog") view=Blog />
+                    <Route path=StaticSegment("/about") view=About />
+                    <Route path=StaticSegment("/contact") view=Contact />
                 </Routes>
             </main>
         </Router>
 
-        <PageFooter/>
+        <PageFooter />
     }
 }
 
@@ -72,10 +72,7 @@ fn HomePage() -> impl IntoView {
             <h1 class="text-6xl tracking-wide">"Welcome to my page!"</h1>
 
             <div>
-                <button
-                    class="btn btn-primary my-4"
-                    on:click=move |_| *count.write() += 1
-                >
+                <button class="btn btn-primary my-4" on:click=move |_| *count.write() += 1>
                     Click me
                     {count}
                 </button>
@@ -103,28 +100,20 @@ fn HomePage() -> impl IntoView {
 
 #[component]
 fn Projects() -> impl IntoView {
-    view! {
-        <h1>Projects</h1>
-    }
+    view! { <h1>Projects</h1> }
 }
 
 #[component]
 fn Blog() -> impl IntoView {
-    view! {
-        <h1>Blog</h1>
-    }
+    view! { <h1>Blog</h1> }
 }
 
 #[component]
 fn About() -> impl IntoView {
-    view! {
-        <h1>About</h1>
-    }
+    view! { <h1>About</h1> }
 }
 
 #[component]
 fn Contact() -> impl IntoView {
-    view! {
-        <h1>Contact</h1>
-    }
+    view! { <h1>Contact</h1> }
 }

@@ -191,4 +191,7 @@ rust-project.json
 .history
 .ionide
 
+# Tailwind
+style.css
+
 # End of https://www.toptal.com/developers/gitignore/api/rust,dotenv,database,rust-analyzer,visualstudiocode,node
