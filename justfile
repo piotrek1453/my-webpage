@@ -3,8 +3,8 @@ default:
     just watch
 
 init:
-    npm init -y
-    npm install -D tailwindcss daisyui@latest
+    pnpm init
+    pnpm install -D tailwindcss daisyui@latest
 
 watch build-type="":
     just watch-tailwind &
