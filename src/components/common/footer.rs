@@ -2,14 +2,17 @@ use leptos::prelude::*;
 
 #[component]
 pub fn PageFooter() -> impl IntoView {
-    #[cfg(feature = "ssr")]
     let current_year = {
-        use time::OffsetDateTime;
-        OffsetDateTime::now_utc().year().to_string()
+        #[cfg(feature = "ssr")]
+        {
+            use time::OffsetDateTime;
+            OffsetDateTime::now_utc().year().to_string()
+        }
+        #[cfg(not(feature = "ssr"))]
+        {
+            String::new()
+        }
     };
-
-    #[cfg(feature = "hydrate")]
-    let current_year = String::new();
 
     view! {
         <footer id="page-footer" class="text-center mt-4 text-sm text-gray-500">
