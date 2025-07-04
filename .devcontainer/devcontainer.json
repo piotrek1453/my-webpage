@@ -1,0 +1,9 @@
+{
+  "name": "Leptos + Postgres",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "settings": {},
+  "extensions": ["rust-lang.rust-analyzer", "ms-azuretools.vscode-docker"],
+  "postCreateCommand": "cargo-leptos watch"
+}
