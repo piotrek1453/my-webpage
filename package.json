@@ -1,7 +1,7 @@
 {
   "name": "my-webpage",
   "version": "1.0.0",
-  "description": "Repo with code of my Leptos+Axum personal webpage.",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "packageManager": "pnpm@10.12.4",
   "devDependencies": {
     "daisyui": "^5.0.43",
     "tailwindcss": "^4.1.11"
