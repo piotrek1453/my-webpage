@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, cupcake;
+  themes: cupcake --default, night --prefersdark;
 }
+
+@custom-variant dark (&:where([data-theme=night], [data-theme=night] *));
 
 @source "../src/**/*.rs";

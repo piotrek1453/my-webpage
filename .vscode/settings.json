@@ -7,5 +7,10 @@
     "--stdin",
     "--rustfmt"
   ],
-  "rust-analyzer.cargo.features": ["ssr"]
+  "rust-analyzer.cargo.features": ["ssr"],
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "./.vscode/daisyui.md"
+    }
+  ]
 }
