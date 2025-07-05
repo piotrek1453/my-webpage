@@ -12,7 +12,7 @@ pub fn NavBar() -> impl IntoView {
     ];
 
     view! {
-        <div class="navbar">
+        <div class="navbar bg-base-100 shadow-sm">
             // rounded-2xl shadow-sm bg-gray-100 dark:bg-gradient-to-br dark:
             // bg-linear-to-b dark:from-purple-600 dark:via-blue-500 dark:to-gray-600
             // dark:border-amber-600 border-1"
