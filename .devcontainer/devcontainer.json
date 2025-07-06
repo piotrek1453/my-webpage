@@ -3,7 +3,9 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
-  "settings": {},
+  "postStartCommand": "echo 'started",
+  "forwardPorts": [8080],
   "extensions": ["rust-lang.rust-analyzer", "ms-azuretools.vscode-docker"],
-  "postCreateCommand": "cargo-leptos watch"
+  "overrideCommand": false,
+  "remoteUser": "appuser"
 }

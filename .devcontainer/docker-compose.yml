@@ -1,33 +1,49 @@
-version: "3.8"
-
 services:
   app:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     volumes:
-      - ..:/workspace:cached
-    command: sleep infinity
+      - type: bind
+        source: ..
+        target: /workspace
+        consistency: cached
+      - cargo_cache:/usr/local/cargo/registry
+      - target_cache:/workspace/target
+    ports:
+      - "8080:8080"
     networks:
       - devnet
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@db:5432/leptos_app
+      RUST_LOG: info
 
   db:
-    image: postgres:16
+    image: postgres:16-alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: leptos_app
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - devnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
+  cargo_cache:
+  target_cache:
 
 networks:
   devnet:
+    name: devcontainer_devnet
+    external: true

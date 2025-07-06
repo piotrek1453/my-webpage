@@ -1,32 +1,61 @@
-# Get started with a build env with Rust nightly
-FROM docker.io/rustlang/rust:nightly-alpine AS builder
+# Builder stage
+FROM mcr.microsoft.com/devcontainers/rust:latest AS builder
 
-RUN apk update && \
-  apk add --no-cache bash curl pnpm libc-dev binaryen
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN pnpm i -D daisyui@latest tailwindcss@latest
-
-RUN curl --proto '=https' --tlsv1.3 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
-
-# Add the WASM target
-RUN rustup target add wasm32-unknown-unknown
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    bash \
+    curl \
+    gnupg \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    libpq-dev \
+    binaryen && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work
 COPY . .
 
-RUN cargo leptos build --release -vv
+# Install cargo-leptos
+RUN rustup target add wasm32-unknown-unknown && \
+    rustup component add rust-src && \
+    cargo build --target wasm32-unknown-unknown || true
+RUN curl --proto '=https' --tlsv1.3 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
 
-FROM rustlang/rust:nightly-alpine as runner
+RUN cargo leptos build
+
+# Runtime stage
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libssl3 \
+    glibc-utils \
+    libpq5 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /root/.devcontainer && chmod -R 777 /root/.devcontainer
 
 WORKDIR /app
 
-COPY --from=builder /work/target/release/leptos_start /app/
-COPY --from=builder /work/target/site /app/site
-COPY --from=builder /work/Cargo.toml /app/
+COPY --from=builder /work/target/release/my-webpage .
+COPY --from=builder /work/target/site ./site
+RUN chmod -R 777 ./site
+RUN chmod +x ./my-webpage
+
+RUN addgroup --gid 1000 appgroup && adduser --uid 1000 --gid 1000 --disabled-password --gecos '' appuser
+USER appuser
 
 ENV RUST_LOG="info"
-ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
-ENV LEPTOS_SITE_ROOT=./site
-EXPOSE 8080
+ENV LEPTOS_SITE_ROOT="./site"
 
-CMD ["/app/leptos_start"]
+EXPOSE 8080
+CMD ["/bin/sh"]
+#CMD ["/app/my-webpage"]
