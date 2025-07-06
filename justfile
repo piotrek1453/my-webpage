@@ -12,7 +12,7 @@ watch build-type="":
     just watch-leptos {{build-type}}
 
 watch-tailwind:
-    pnpx @tailwindcss/cli -i style/tailwind.css -o static/style.css --watch --minify
+    pnpx @tailwindcss/cli -i style/tailwind.css -o static/style.css --watch
 
 watch-leptos build-type="":
     cargo leptos watch {{build-type}}

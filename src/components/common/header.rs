@@ -40,7 +40,7 @@ pub fn PageHeader() -> impl IntoView {
                     <input
                         type="checkbox"
                         class="toggle theme-controller"
-                        checked=is_dark.get()
+                        checked=move || is_dark.get()
                         on:input=move |ev| {
                             let checked = event_target_checked(&ev);
                             is_dark.set(checked);
