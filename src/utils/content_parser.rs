@@ -1,22 +1,14 @@
-use crate::components::common::content::Image;
 use leptos::prelude::*;
 use std::fs;
 
-pub fn parse_markdown_with_images(md: &str) -> impl IntoView {
-    md.lines()
-        .map(|line| {
-            if let Some(path) = line
-                .strip_prefix("[image:")
-                .and_then(|s| s.strip_suffix("]"))
-            {
-                view! { <Image image_path=path /> }
-            } else {
-                view! { <p>{line}</p> }
-            }
-        })
-        .collect_view()
+pub fn parse_markdown(md: String) -> impl IntoView {
+    let parser = pulldown_cmark::Parser::new(&md);
+    let mut html_output = String::new();
+    pulldown_cmark::html::push_html(&mut html_output, parser);
+    print!("{}", html_output);
+    view! { <div inner_html=html_output></div> }
 }
 
-pub fn read_markdown_from_file(md_path: &str) -> String {
+pub fn read_markdown_from_file(md_path: String) -> String {
     fs::read_to_string(md_path).expect("Unable to read the file")
 }
