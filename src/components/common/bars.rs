@@ -1,3 +1,4 @@
+use crate::components::common::theme_switcher::ThemeSwitcher;
 use leptos::prelude::*;
 
 #[component]
@@ -11,7 +12,7 @@ pub fn NavBar() -> impl IntoView {
     ];
 
     view! {
-        <div class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+        <div class="navbar dark:bg-indigo-950/60 bg-base-100/80 shadow-md backdrop-blur-sm rounded-b-lg sticky top-0 z-50">
             <div class="navbar-start">
                 // Mobile dropdown
                 <div class="dropdown">
@@ -70,7 +71,9 @@ pub fn NavBar() -> impl IntoView {
                 </ul>
             </div>
             // TODO: move theme switch here
-            <div class="navbar-end"></div>
+            <div class="navbar-end">
+                <ThemeSwitcher />
+            </div>
         </div>
     }
 }

@@ -40,7 +40,6 @@ pub fn App() -> impl IntoView {
         <Title text="Welcome to my page!" />
 
         // content for this welcome page
-        <header::PageHeader />
         <bars::NavBar />
 
         <Router>
