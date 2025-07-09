@@ -5,7 +5,6 @@ pub fn parse_markdown(md: String) -> impl IntoView {
     let parser = pulldown_cmark::Parser::new(&md);
     let mut html_output = String::new();
     pulldown_cmark::html::push_html(&mut html_output, parser);
-    print!("{}", html_output);
     view! { <div inner_html=html_output></div> }
 }
 
