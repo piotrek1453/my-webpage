@@ -1,11 +1,64 @@
 {
-  "name": "Leptos + Postgres",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "app",
-  "workspaceFolder": "/workspace",
-  "postStartCommand": "echo 'started",
-  "forwardPorts": [8080],
-  "extensions": ["rust-lang.rust-analyzer", "ms-azuretools.vscode-docker"],
-  "overrideCommand": false,
-  "remoteUser": "appuser"
+  "name": "Leptos Dev Container",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "target": "dev",
+    "context": "..",
+    "args": {
+      "LEPTOS_ENV": "development"
+    }
+  },
+  "forwardPorts": [
+    8080
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "Leptos App",
+      "onAutoForward": "notify",
+      "requireLocalPort": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "usernamehw.errorlens",
+        "oderwat.indent-rainbow",
+        "moalamri.inline-fold",
+        "mondeja.leptos-snippets",
+        "masterustacean.leptos-fmt",
+        "qwtel.sqlite-viewer",
+        "bradlc.vscode-tailwindcss",
+        "phu1237.vs-browser"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "fish",
+        "terminal.integrated.profiles.linux": {
+          "fish": {
+            "path": "/usr/bin/fish",
+            "icon": "terminal-bash"
+          }
+        }
+      }
+    }
+  },
+  "mounts": [
+    "type=volume,source=cargo-registry,target=/usr/local/cargo/registry",
+    "type=volume,source=rust-target,target=/app/target",
+    "type=volume,source=cargo-bin,target=/usr/local/cargo/bin"
+  ],
+  "runArgs": [
+    "--userns=keep-id",
+    "--security-opt=label=disable",
+    "--security-opt=seccomp=unconfined",
+    "--cap-add=SYS_PTRACE"
+  ],
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "LEPTOS_SITE_ADDR": "0.0.0.0:8080"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+  "workspaceFolder": "/app",
+  "postStartCommand": "pnpm install daisyui@latest && cargo leptos watch --hot-reload"
 }

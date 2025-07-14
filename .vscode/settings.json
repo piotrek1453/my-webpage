@@ -12,5 +12,6 @@
     {
       "file": "./.vscode/daisyui.md"
     }
-  ]
+  ],
+  "remote.autoForwardPorts": false
 }
