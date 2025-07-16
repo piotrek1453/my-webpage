@@ -70,7 +70,6 @@ pub fn NavBar() -> impl IntoView {
                         .collect_view()}
                 </ul>
             </div>
-            // TODO: move theme switch here
             <div class="navbar-end">
                 <ThemeSwitcher />
             </div>

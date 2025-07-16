@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos::web_sys;
 
-#[component]
+#[island]
 pub fn ThemeSwitcher() -> impl IntoView {
     // true = dark, false = light
     let is_dark = RwSignal::new(true);

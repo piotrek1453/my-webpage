@@ -48,7 +48,8 @@
   "mounts": [
     "type=volume,source=cargo-registry,target=/usr/local/cargo/registry",
     "type=volume,source=rust-target,target=/app/target",
-    "type=volume,source=cargo-bin,target=/usr/local/cargo/bin"
+    "type=volume,source=cargo-bin,target=/usr/local/cargo/bin",
+    "source=${env:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
   ],
   "runArgs": [
     "--userns=keep-id",
