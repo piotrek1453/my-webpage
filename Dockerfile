@@ -1,6 +1,5 @@
 FROM docker.io/rustlang/rust:nightly-alpine as toolchain
 
-# Dodaj bash do apk add
 RUN apk add --no-cache musl-dev git curl bash
 
 # Install cargo-binstall (prebuilt binary)
@@ -11,12 +10,13 @@ RUN cargo binstall cargo-leptos --locked --no-confirm
 
 # Stage 0: Base image with dependencies (for dev/build stages)
 FROM docker.io/rustlang/rust:nightly-alpine as base
-RUN apk add --no-cache musl-dev openssl-dev npm bash shadow sudo git fish perl make && \
+RUN apk add --no-cache musl-dev openssl-dev npm bash shadow sudo git fish perl make openssh sccache && \
     npm i -g pnpm && \
     adduser -D vscode -s /usr/bin/fish && \
     echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     rustup target add wasm32-unknown-unknown && \
     mkdir -p /app && chown vscode:vscode /app
+ENV RUSTC_WRAPPER=sccache
 WORKDIR /app
 USER vscode
 COPY --from=toolchain /usr/local/cargo/bin/cargo-leptos /usr/local/cargo/bin/
@@ -39,16 +39,14 @@ FROM base as builder
 COPY --chown=vscode:vscode . .
 COPY --from=cacher /app/target target
 COPY --from=cacher /usr/local/cargo /usr/local/cargo
-ENV LEPTOS_WASM_OPT_VERSION=version_117
 RUN cargo leptos build --release
 
 # Stage 4: Dev environment (hot reload)
 FROM base as dev
+RUN cargo install leptosfmt
 COPY --chown=vscode:vscode . .
 ENV LEPTOS_ENV=development \
-    RUST_LOG=info \
-    LEPTOS_SITE_ADDR=0.0.0.0:8080 \
-    LEPTOS_SITE_ROOT=site
+    RUST_LOG=info
 EXPOSE 8080
 CMD ["cargo", "leptos", "watch", "--hot-reload"]
 

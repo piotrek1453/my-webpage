@@ -8,6 +8,7 @@
       "LEPTOS_ENV": "development"
     }
   },
+  // don't forget to change the port here to match one from LEPTOS_SITE_ADDR defined in .env file
   "forwardPorts": [
     8080
   ],
@@ -30,7 +31,8 @@
         "masterustacean.leptos-fmt",
         "qwtel.sqlite-viewer",
         "bradlc.vscode-tailwindcss",
-        "phu1237.vs-browser"
+        "phu1237.vs-browser",
+        "ms-azuretools.vscode-containers"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "fish",
@@ -52,13 +54,12 @@
     "--userns=keep-id",
     "--security-opt=label=disable",
     "--security-opt=seccomp=unconfined",
-    "--cap-add=SYS_PTRACE"
+    "--cap-add=SYS_PTRACE",
+    "--env-file",
+    ".env"
   ],
   "remoteUser": "vscode",
-  "remoteEnv": {
-    "LEPTOS_SITE_ADDR": "0.0.0.0:8080"
-  },
   "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
   "workspaceFolder": "/app",
-  "postStartCommand": "pnpm install daisyui@latest && cargo leptos watch --hot-reload"
+  "postStartCommand": "pnpm install daisyui@$DAISYUI_VERSION && cargo leptos watch --hot-reload"
 }

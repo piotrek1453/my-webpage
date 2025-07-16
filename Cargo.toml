@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { version = "0.8.2", features = ["nightly"] }
+leptos = { version = "0.8.2", features = ["nightly", "islands"] }
 leptos_router = { version = "0.8.2", features = ["nightly"] }
 axum = { version = "0.8.4", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
@@ -47,7 +47,7 @@ output-name = "my-webpage"
 tailwind-input-file = "style/tailwind.css"
 
 # The site root folder is where cargo-leptos generate all output. WARNING: all content of this folder will be erased on a rebuild. Use it in your server setup.
-site-root = "target/site"
+# site-root = "target/site"
 
 # The site-root relative folder where all compiled output (JS, WASM and CSS) is written
 # Defaults to pkg
@@ -60,7 +60,7 @@ site-pkg-dir = "pkg"
 assets-dir = "public"
 
 # The IP and port (ex: 127.0.0.1:3000) where the server serves the content. Use it in your server setup.
-site-addr = "0.0.0.0:8080"
+# site-addr = "0.0.0.0:8080"
 
 # The port to use for automatic reload monitoring
 reload-port = 3001
