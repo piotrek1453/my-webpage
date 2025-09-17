@@ -14,7 +14,7 @@ console_error_panic_hook = { version = "0.1", optional = true }
 leptos_axum = { version = "0.8.6", optional = true }
 leptos_meta = { version = "0.8.5" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
-wasm-bindgen = { version = "=0.2.100", optional = true }
+wasm-bindgen = { version = "=0.2.103", optional = true }
 time = { version = "0.3", optional = true }
 tower-http = "0.6.6"
 pulldown-cmark = "0.13.0"
@@ -23,6 +23,7 @@ sqlx = { version = "0.8.6", features = [
     "runtime-tokio-rustls",
 ], optional = true }
 getrandom = { version = "0.2.16", features = ["js"], optional = true }
+dotenvy = { version = "0.15.7", optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1", default-features = false, optional = true }
@@ -43,6 +44,7 @@ ssr = [
     "leptos_router/ssr",
     "time",
     "dep:sqlx",
+    "dep:dotenvy",
 ]
 time = ["dep:time"]
 

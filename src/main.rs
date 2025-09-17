@@ -10,6 +10,9 @@ async fn main() {
     use std::env;
     use tower_http::services::ServeDir;
 
+    // Load variables from .env before reading configuration / DATABASE_URL
+    let _ = dotenvy::dotenv();
+
     let conf = get_configuration(None).unwrap();
     let addr = conf.leptos_options.site_addr;
     let leptos_options = conf.leptos_options;
