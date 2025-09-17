@@ -10,7 +10,7 @@ RUN cargo binstall cargo-leptos --locked --no-confirm
 
 # Stage 0: Base image with dependencies (for dev/build stages)
 FROM docker.io/rustlang/rust:nightly-alpine as base
-RUN apk add --no-cache musl-dev openssl-dev npm bash shadow sudo git fish perl make openssh sccache && \
+RUN apk add --no-cache musl-dev openssl-dev npm bash shadow sudo git fish perl make openssh sccache clang llvm && \
     npm i -g pnpm && \
     adduser -D vscode -s /usr/bin/fish && \
     echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \

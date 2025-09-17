@@ -32,7 +32,10 @@
         "qwtel.sqlite-viewer",
         "bradlc.vscode-tailwindcss",
         "phu1237.vs-browser",
-        "ms-azuretools.vscode-containers"
+        "ms-azuretools.vscode-containers",
+        "foxundermoon.shell-format",
+        "timonwong.shellcheck",
+        "fill-labs.dependi"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "fish",
@@ -49,7 +52,8 @@
     "type=volume,source=cargo-registry,target=/usr/local/cargo/registry",
     "type=volume,source=rust-target,target=/app/target",
     "type=volume,source=cargo-bin,target=/usr/local/cargo/bin",
-    "source=${env:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+    "source=${env:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+    "type=volume,source=postgres-data,target=/var/lib/postgresql/data"
   ],
   "runArgs": [
     "--userns=keep-id",
@@ -62,5 +66,22 @@
   "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
   "workspaceFolder": "/app",
-  "postStartCommand": "pnpm install daisyui@$DAISYUI_VERSION && cargo leptos watch --hot-reload"
+  "postStartCommand": "pnpm install daisyui@$DAISYUI_VERSION && cargo leptos watch --hot-reload",
+  "services": {
+    "postgres": {
+      "image": "postgres:17-alpine",
+      "restart": "unless-stopped",
+      "env": {
+        "POSTGRES_USER": "leptos",
+        "POSTGRES_PASSWORD": "leptos",
+        "POSTGRES_DB": "leptos_db"
+      },
+      "ports": [
+        "5432:5432"
+      ],
+      "volumes": [
+        "postgres-data:/var/lib/postgresql/data"
+      ]
+    }
+  }
 }

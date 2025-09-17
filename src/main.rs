@@ -6,6 +6,8 @@ async fn main() {
     use leptos::prelude::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use my_webpage::app::*;
+    use sqlx::postgres::PgPoolOptions;
+    use std::env;
     use tower_http::services::ServeDir;
 
     let conf = get_configuration(None).unwrap();
@@ -13,6 +15,18 @@ async fn main() {
     let leptos_options = conf.leptos_options;
     // Generate the list of routes in your Leptos App
     let routes = generate_route_list(App);
+
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await.unwrap();
+
+    let row: (i64,) = sqlx::query_as("SELECT 1")
+        .fetch_one(&pool)
+        .await.unwrap();
+    println!("Test query result: {}", row.0);
 
     let app = Router::new().nest_service("/static", ServeDir::new("static"))
         .leptos_routes(&leptos_options, routes, {
