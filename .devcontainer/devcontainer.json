@@ -8,7 +8,6 @@
       "LEPTOS_ENV": "development"
     }
   },
-  // don't forget to change the port here to match one from LEPTOS_SITE_ADDR defined in .env file
   "forwardPorts": [
     8080
   ],
@@ -56,17 +55,17 @@
     "type=volume,source=postgres-data,target=/var/lib/postgresql/data"
   ],
   "runArgs": [
-    "--userns=keep-id",
     "--security-opt=label=disable",
     "--security-opt=seccomp=unconfined",
     "--cap-add=SYS_PTRACE",
     "--env-file",
-    ".env"
+    "../.env"
   ],
   "remoteUser": "vscode",
+  "updateRemoteUserUID": false,
   "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
   "workspaceFolder": "/app",
-  "postStartCommand": "pnpm install daisyui@$DAISYUI_VERSION && cargo leptos watch --hot-reload",
+  "postStartCommand": "sudo chown -R vscode:vscode /app/target || true; pnpm install daisyui@$DAISYUI_VERSION && cargo leptos watch --hot-reload",
   "services": {
     "postgres": {
       "image": "postgres:17-alpine",
