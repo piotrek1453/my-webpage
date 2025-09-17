@@ -7,20 +7,33 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { version = "0.8.2", features = ["nightly", "islands"] }
-leptos_router = { version = "0.8.2", features = ["nightly"] }
+leptos = { version = "0.8.8", features = ["nightly", "islands"] }
+leptos_router = { version = "0.8.6", features = ["nightly"] }
 axum = { version = "0.8.4", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
-leptos_axum = { version = "0.8.2", optional = true }
-leptos_meta = { version = "0.8.2" }
+leptos_axum = { version = "0.8.6", optional = true }
+leptos_meta = { version = "0.8.5" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.100", optional = true }
 time = { version = "0.3", optional = true }
 tower-http = "0.6.6"
 pulldown-cmark = "0.13.0"
+sqlx = { version = "0.8.6", features = [
+    "postgres",
+    "runtime-tokio-rustls",
+], optional = true }
+getrandom = { version = "0.2.16", features = ["js"], optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+tokio = { version = "1", default-features = false, optional = true }
 
 [features]
-hydrate = ["leptos/hydrate", "dep:console_error_panic_hook", "dep:wasm-bindgen"]
+hydrate = [
+    "leptos/hydrate",
+    "dep:console_error_panic_hook",
+    "dep:wasm-bindgen",
+    "dep:getrandom",
+]
 ssr = [
     "dep:axum",
     "dep:tokio",
@@ -29,6 +42,7 @@ ssr = [
     "leptos_meta/ssr",
     "leptos_router/ssr",
     "time",
+    "dep:sqlx",
 ]
 time = ["dep:time"]
 
