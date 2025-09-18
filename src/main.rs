@@ -26,7 +26,7 @@ async fn main() {
         .connect(&database_url)
         .await.unwrap();
 
-    let row: (i64,) = sqlx::query_as("SELECT 1")
+    let row: (i32,) = sqlx::query_as("SELECT 1")
         .fetch_one(&pool)
         .await.unwrap();
     println!("Test query result: {}", row.0);
