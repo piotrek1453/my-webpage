@@ -202,3 +202,4 @@ pnpm-lock.yaml
 site/
 
 # End of https://www.toptal.com/developers/gitignore/api/rust,dotenv,database,rust-analyzer,visualstudiocode,node
+package-lock.json
