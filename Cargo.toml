@@ -9,32 +9,28 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 leptos = { version = "0.8.9", features = ["nightly", "islands"] }
 leptos_router = { version = "0.8.7", features = ["nightly"] }
-axum = { version = "0.8.4", optional = true }
+axum = { version = "0.8.5", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
+tracing = { version = "0.1.41" }
+tracing-subscriber = { version = "0.3.20" }
 leptos_axum = { version = "0.8.6", optional = true }
 leptos_meta = { version = "0.8.5" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
-wasm-bindgen = { version = "=0.2.103", optional = true }
-time = { version = "0.3", optional = true }
-tower-http = "0.6.6"
+wasm-bindgen = { version = "=0.2.104", optional = true }
+time = { version = "0.3.44", optional = true }
+tower-http = { version = "0.6.6", features = ["trace"] }
 pulldown-cmark = "0.13.0"
 sqlx = { version = "0.8.6", features = [
     "postgres",
     "runtime-tokio-rustls",
 ], optional = true }
-getrandom = { version = "0.2.16", features = ["js"], optional = true }
 dotenvy = { version = "0.15.7", optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1", default-features = false, optional = true }
 
 [features]
-hydrate = [
-    "leptos/hydrate",
-    "dep:console_error_panic_hook",
-    "dep:wasm-bindgen",
-    "dep:getrandom",
-]
+hydrate = ["leptos/hydrate", "dep:console_error_panic_hook", "dep:wasm-bindgen"]
 ssr = [
     "dep:axum",
     "dep:tokio",
@@ -74,9 +70,6 @@ site-pkg-dir = "pkg"
 #
 # Optional. Env: LEPTOS_ASSETS_DIR.
 assets-dir = "public"
-
-# The IP and port (ex: 127.0.0.1:3000) where the server serves the content. Use it in your server setup.
-# site-addr = "0.0.0.0:8080"
 
 # The port to use for automatic reload monitoring
 reload-port = 3001

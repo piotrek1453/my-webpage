@@ -25,12 +25,12 @@ pub fn PageFooter() -> impl IntoView {
                     class="inline-block"
                 >
                     <img
-                        src="/static/github-mark.svg"
+                        src="github-mark.svg"
                         alt="GitHub logo (light mode)"
                         class="block dark:hidden w-8 h-8"
                     />
                     <img
-                        src="/static/github-mark-white.svg"
+                        src="github-mark-white.svg"
                         alt="GitHub logo (dark mode)"
                         class="hidden dark:block w-8 h-8"
                     />
