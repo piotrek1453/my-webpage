@@ -8,7 +8,7 @@ pub fn About() -> impl IntoView {
         <Title title="About" />
         <Content>
             {content_parser::parse_markdown(
-                content_parser::read_markdown_from_file("static/test.md".to_string()),
+                content_parser::read_markdown_from_file("./public/test.md".to_string()),
             )}
         </Content>
     }
