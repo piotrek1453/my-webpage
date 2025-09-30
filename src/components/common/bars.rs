@@ -51,7 +51,7 @@ pub fn NavBar() -> impl IntoView {
                     </ul>
                 </div>
                 <a class="btn btn-ghost text-xl" href="/">
-                    daisyUI
+                    CDreamz
                 </a>
             </div>
             <div class="navbar-center hidden lg:flex">
