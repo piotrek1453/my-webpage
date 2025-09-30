@@ -3,15 +3,16 @@
 async fn main() {
     use axum::Router;
     use leptos::prelude::*;
-    use leptos_axum::{generate_route_list, LeptosRoutes};
+    use leptos_axum::{LeptosRoutes, generate_route_list};
     use my_webpage::app::*;
+    use my_webpage::models::*;
     use sqlx::postgres::PgPoolOptions;
     use std::env;
     use tower_http::{services::ServeDir, trace::TraceLayer};
 
     tracing_subscriber::fmt()
-    .with_max_level(tracing::Level::DEBUG)
-    .init();
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
 
     // Load variables from .env before reading configuration / DATABASE_URL
     tracing::info!("Loading variables from .env file");
@@ -19,7 +20,7 @@ async fn main() {
 
     tracing::info!("Loading config");
     // TODO: look into the config: there's something wrong with parsing the address from .env
-    let conf = get_configuration(None).unwrap();
+    let conf = get_configuration(None).expect("Error reading Leptos configuration");
     let addr = conf.leptos_options.site_addr;
     let leptos_options = conf.leptos_options;
 
@@ -30,31 +31,57 @@ async fn main() {
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&database_url)
-        .await.unwrap();
+        .await
+        .expect("Error creating PgPool");
 
-    let row: (i32,) = sqlx::query_as("SELECT 1")
-        .fetch_one(&pool)
-        .await.unwrap();
-    tracing::info!("Test query result: {}", row.0);
+    // DB migrations
+    tracing::info!("Running migrations");
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Error running migrations");
 
-    // Generate the list of routes in your Leptos App
+    let post = sqlx::query_as!(
+        post::Post,
+        "SELECT id, title, slug, content_md, created_at, updated_at FROM post WHERE id = $1",
+        1
+    )
+    .fetch_one(&pool)
+    .await
+    .expect("Error querying");
+
+    tracing::info!("Post: {:?}", post);
+
+    // Generate the list of routes in Leptos app and pass stuff to context
     tracing::info!("Setting up routes");
     let routes = generate_route_list(App);
-    let app = Router::new().nest_service("/public", ServeDir::new("public"))
-        .leptos_routes(&leptos_options, routes, {
-            let leptos_options = leptos_options.clone();
-            move || shell(leptos_options.clone())
-        })
+    let app = Router::new()
+        .nest_service("/public", ServeDir::new("public"))
+        .leptos_routes_with_context(
+            &leptos_options,
+            routes,
+            {
+                let pool = pool.clone();
+                move || provide_context(pool.clone())
+            },
+            {
+                let leptos_options = leptos_options.clone();
+                move || shell(leptos_options.clone())
+            },
+        )
         .fallback(leptos_axum::file_and_error_handler(shell))
-        .with_state(leptos_options).layer(TraceLayer::new_for_http());
+        .with_state(leptos_options)
+        .layer(TraceLayer::new_for_http());
 
     // run our app with hyper
     // `axum::Server` is a re-export of `hyper::Server`
     tracing::info!("listening on http://{}", &addr);
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr)
+        .await
+        .expect("Error starting TcpListener");
     axum::serve(listener, app.into_make_service())
         .await
-        .unwrap();
+        .expect("Error starting Axum server");
 }
 
 #[cfg(not(feature = "ssr"))]

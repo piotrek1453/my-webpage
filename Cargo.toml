@@ -17,14 +17,17 @@ leptos_axum = { version = "0.8.6", optional = true }
 leptos_meta = { version = "0.8.5" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.104", optional = true }
-time = { version = "0.3.44", optional = true }
+time = { version = "0.3.44", optional = true, features = ["serde"] }
 tower-http = { version = "0.6.6", features = ["trace"] }
 pulldown-cmark = "0.13.0"
 sqlx = { version = "0.8.6", features = [
     "postgres",
     "runtime-tokio-rustls",
+    "time",
+    "macros",
 ], optional = true }
 dotenvy = { version = "0.15.7", optional = true }
+serde = { version = "1.0.228" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1", default-features = false, optional = true }
