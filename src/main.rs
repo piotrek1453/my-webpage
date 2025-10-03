@@ -5,7 +5,6 @@ async fn main() {
     use leptos::prelude::*;
     use leptos_axum::{LeptosRoutes, generate_route_list};
     use my_webpage::app::*;
-    use my_webpage::models::*;
     use sqlx::postgres::PgPoolOptions;
     use std::env;
     use tower_http::{services::ServeDir, trace::TraceLayer};
@@ -40,17 +39,6 @@ async fn main() {
         .run(&pool)
         .await
         .expect("Error running migrations");
-
-    let post = sqlx::query_as!(
-        post::Post,
-        "SELECT id, title, slug, content_md, created_at, updated_at FROM post WHERE id = $1",
-        1
-    )
-    .fetch_one(&pool)
-    .await
-    .expect("Error querying");
-
-    tracing::info!("Post: {:?}", post);
 
     // Generate the list of routes in Leptos app and pass stuff to context
     tracing::info!("Setting up routes");

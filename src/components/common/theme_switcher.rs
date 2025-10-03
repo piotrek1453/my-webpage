@@ -9,11 +9,10 @@ pub fn ThemeSwitcher() -> impl IntoView {
     // Effect: update data-theme on <html> when toggled
     Effect::new(move |_| {
         let theme = if is_dark.get() { "night" } else { "cupcake" };
-        if let Some(document) = web_sys::window().and_then(|w| w.document()) {
-            if let Some(html) = document.document_element() {
+        if let Some(document) = web_sys::window().and_then(|w| w.document())
+            && let Some(html) = document.document_element() {
                 html.set_attribute("data-theme", theme).ok();
             }
-        }
     });
 
     view! {
@@ -30,7 +29,7 @@ pub fn ThemeSwitcher() -> impl IntoView {
                 />
                 // <!-- sun icon -->
                 <svg
-                    class="swap-off h-8 w-8 fill-current"
+                    class="w-8 h-8 fill-current swap-off"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                 >
@@ -39,7 +38,7 @@ pub fn ThemeSwitcher() -> impl IntoView {
 
                 // <!-- moon icon -->
                 <svg
-                    class="swap-on h-8 w-8 fill-current"
+                    class="w-8 h-8 fill-current swap-on"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                 >

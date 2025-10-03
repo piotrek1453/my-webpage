@@ -9,15 +9,14 @@ pub fn PageHeader() -> impl IntoView {
     // Effect: update data-theme on <html> when toggled
     Effect::new(move |_| {
         let theme = if is_dark.get() { "night" } else { "cupcake" };
-        if let Some(document) = web_sys::window().and_then(|w| w.document()) {
-            if let Some(html) = document.document_element() {
+        if let Some(document) = web_sys::window().and_then(|w| w.document())
+            && let Some(html) = document.document_element() {
                 html.set_attribute("data-theme", theme).ok();
             }
-        }
     });
 
     view! {
-        <header class="flex items-center justify-between text-6x1 tracking-wide">
+        <header class="flex justify-between items-center tracking-wide text-6x1">
             <div>
                 <h1>Welcome to my page!!!</h1>
             </div>
@@ -34,7 +33,7 @@ pub fn PageHeader() -> impl IntoView {
                     />
                     // <!-- sun icon -->
                     <svg
-                        class="swap-off h-8 w-8 fill-current"
+                        class="w-8 h-8 fill-current swap-off"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                     >
@@ -43,7 +42,7 @@ pub fn PageHeader() -> impl IntoView {
 
                     // <!-- moon icon -->
                     <svg
-                        class="swap-on h-8 w-8 fill-current"
+                        class="w-8 h-8 fill-current swap-on"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                     >
