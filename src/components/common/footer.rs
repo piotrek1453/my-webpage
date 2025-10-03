@@ -15,8 +15,8 @@ pub fn PageFooter() -> impl IntoView {
     };
 
     view! {
-        <footer id="page-footer" class="text-center mt-4 text-sm text-gray-500">
-            <p class="flex items-center justify-center gap-2">
+        <footer id="page-footer" class="mt-4 text-sm text-center text-gray-500">
+            <p class="flex gap-2 justify-center items-center">
                 {format!("© {current_year} Piotr Jucha")}
                 <a
                     href="https://github.com/piotrek1453/my-webpage"
@@ -27,12 +27,12 @@ pub fn PageFooter() -> impl IntoView {
                     <img
                         src="github-mark.svg"
                         alt="GitHub logo (light mode)"
-                        class="block dark:hidden w-8 h-8"
+                        class="block w-8 h-8 dark:hidden"
                     />
                     <img
                         src="github-mark-white.svg"
                         alt="GitHub logo (dark mode)"
-                        class="hidden dark:block w-8 h-8"
+                        class="hidden w-8 h-8 dark:block"
                     />
                 </a>- licensed under BSD 3-Clause license.
             </p>

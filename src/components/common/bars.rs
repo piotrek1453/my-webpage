@@ -12,14 +12,14 @@ pub fn NavBar() -> impl IntoView {
     ];
 
     view! {
-        <div class="navbar dark:bg-indigo-950/60 bg-base-100/80 shadow-md backdrop-blur-sm rounded-b-lg sticky top-0 z-50">
+        <div class="sticky top-0 z-50 rounded-b-lg shadow-md navbar bg-base-100/80 backdrop-blur-sm dark:bg-indigo-950/60">
             <div class="navbar-start">
                 // Mobile dropdown
                 <div class="dropdown">
-                    <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                    <div tabindex="0" role="button" class="lg:hidden btn btn-ghost">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
+                            class="w-5 h-5"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -34,14 +34,14 @@ pub fn NavBar() -> impl IntoView {
                     </div>
                     <ul
                         tabindex="0"
-                        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+                        class="p-2 mt-3 w-52 shadow menu menu-sm dropdown-content bg-base-100 rounded-box z-1"
                     >
                         {nav_items
                             .iter()
                             .map(|(label, href)| {
                                 view! {
                                     <li>
-                                        <a class="btn-ghost rounded" href=*href>
+                                        <a class="rounded btn-ghost" href=*href>
                                             {*label}
                                         </a>
                                     </li>
@@ -50,18 +50,18 @@ pub fn NavBar() -> impl IntoView {
                             .collect_view()}
                     </ul>
                 </div>
-                <a class="btn btn-ghost text-xl" href="/">
+                <a class="text-xl btn btn-ghost" href="/">
                     CDreamz
                 </a>
             </div>
-            <div class="navbar-center hidden lg:flex">
-                <ul class="menu menu-horizontal px-1">
+            <div class="hidden lg:flex navbar-center">
+                <ul class="px-1 menu menu-horizontal">
                     {nav_items
                         .iter()
                         .map(|(label, href)| {
                             view! {
                                 <li>
-                                    <a class="btn-ghost rounded" href=*href>
+                                    <a class="rounded btn-ghost" href=*href>
                                         {*label}
                                     </a>
                                 </li>

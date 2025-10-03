@@ -5,7 +5,7 @@ pub fn Button() -> impl IntoView {
     let count = RwSignal::new(0);
     view! {
         <div>
-            <button class="btn btn-primary my-4" on:click=move |_| *count.write() += 1>
+            <button class="my-4 btn btn-primary" on:click=move |_| *count.write() += 1>
                 Click me
                 {count}
             </button>
@@ -17,7 +17,7 @@ pub fn Button() -> impl IntoView {
 #[component]
 pub fn HomePage() -> impl IntoView {
     view! {
-        <div class="container gap-6 grid grid-cols-1 pt-20 mx-auto text-center">
+        <div class="container grid grid-cols-1 gap-6 pt-20 mx-auto text-center">
 
             <h1 class="text-6xl tracking-wide">"Welcome to my page!"</h1>
             <Button />
