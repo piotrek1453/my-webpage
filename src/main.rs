@@ -16,10 +16,10 @@ async fn main() {
 
     // Load variables from .env before reading configuration / DATABASE_URL
     tracing::info!("Loading variables from .env file");
-    let _ = dotenvy::dotenv();
+    let _ = dotenvy::dotenv().ok();
 
-    tracing::info!("Loading config");
-    // TODO: look into the config: there's something wrong with parsing the address from .env
+    // Load variables needed for Leptos
+    tracing::info!("Loading Leptos config");
     let conf = get_configuration(None).expect("Error reading Leptos configuration");
     let addr = conf.leptos_options.site_addr;
     let leptos_options = conf.leptos_options;
