@@ -1,4 +1,4 @@
-use crate::components::common::{content::Content, title::Title};
+use crate::components::common::title::Title;
 use leptos::prelude::*;
 
 #[component]
