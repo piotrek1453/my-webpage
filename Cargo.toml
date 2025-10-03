@@ -1,22 +1,23 @@
 [package]
 name = "my-webpage"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { version = "0.8.9", features = ["nightly", "islands"] }
-leptos_router = { version = "0.8.7", features = ["nightly"] }
-axum = { version = "0.8.5", optional = true }
+leptos = { version = "0.8.10", features = ["nightly", "islands"] }
+leptos_router = { version = "0.8.8", features = ["nightly"] }
+axum = { version = "0.8.6", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
-tracing = { version = "0.1.41" }
-tracing-subscriber = { version = "0.3.20" }
 leptos_axum = { version = "0.8.6", optional = true }
 leptos_meta = { version = "0.8.5" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.104", optional = true }
+# start-axum template deps end
+tracing = { version = "0.1.41" }
+tracing-subscriber = { version = "0.3.20" }
 time = { version = "0.3.44", optional = true, features = ["serde"] }
 tower-http = { version = "0.6.6", features = ["trace"] }
 pulldown-cmark = "0.13.0"
