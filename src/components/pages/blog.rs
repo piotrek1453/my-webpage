@@ -1,6 +1,7 @@
 use crate::components::common::title::Title;
 use crate::models::post::Post;
 use crate::utils::content_parser::parse_markdown;
+use anyhow::Result;
 use leptos::prelude::*;
 
 #[component]
@@ -85,25 +86,15 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
 
 #[server]
 pub async fn get_blogposts() -> Result<Vec<Post>, ServerFnError> {
-    let pool = match use_context::<sqlx::Pool<sqlx::Postgres>>() {
-        None => {
-            return Err(ServerFnError::ServerError(
-                "Error accessing database connection pool".to_string(),
-            ));
-        }
-        Some(p) => p,
-    };
-
-    let posts = match sqlx::query_as!(
+    sqlx::query_as!(
         Post,
         "SELECT id, title, slug, content_md, created_at, updated_at FROM post"
     )
-    .fetch_all(&pool)
+    .fetch_all(&use_context::<sqlx::Pool<sqlx::Postgres>>().ok_or_else(|| {
+        ServerFnError::<std::convert::Infallible>::ServerError(
+            "Error accessing database connection pool".into(),
+        )
+    })?)
     .await
-    {
-        Err(e) => return Err(ServerFnError::ServerError(e.to_string())),
-        Ok(p) => p,
-    };
-
-    Ok(posts)
+    .map_err(|e| ServerFnError::ServerError(format!("Database query failed: {e}")))
 }

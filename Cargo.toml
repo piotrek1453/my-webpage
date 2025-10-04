@@ -16,6 +16,11 @@ leptos_meta = { version = "0.8.5" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "=0.2.104", optional = true }
 # start-axum template deps end
+
+# WORKAROUND
+leptos_integration_utils = { version = "0.8.6", optional = true }
+# WORKAROUND
+anyhow = { version = "1.0.100" }
 tracing = { version = "0.1.41" }
 tracing-subscriber = { version = "0.3.20" }
 time = { version = "0.3.44", optional = true, features = ["serde"] }
@@ -45,6 +50,7 @@ ssr = [
     "time",
     "dep:sqlx",
     "dep:dotenvy",
+    "dep:leptos_integration_utils",
 ]
 time = ["dep:time"]
 
