@@ -7,7 +7,7 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { version = "0.8.10", features = ["nightly", "islands"] }
+leptos = { version = "0.8.10", default-features = false }
 leptos_router = { version = "0.8.8", features = ["nightly"] }
 axum = { version = "0.8.6", optional = true }
 console_error_panic_hook = { version = "0.1", optional = true }
@@ -37,7 +37,6 @@ serde = { version = "1.0.228" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1", default-features = false, optional = true }
-wee_alloc = "0.4.5"
 
 [features]
 ssr = [
@@ -47,13 +46,18 @@ ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
-    "time",
+    "dep:time",
     "dep:pulldown-cmark",
     "dep:sqlx",
     "dep:dotenvy",
     "dep:leptos_integration_utils",
 ]
-hydrate = ["leptos/hydrate", "dep:console_error_panic_hook", "dep:wasm-bindgen"]
+hydrate = [
+    "leptos/hydrate",
+    "leptos/islands",
+    "dep:console_error_panic_hook",
+    "dep:wasm-bindgen",
+]
 time = ["dep:time"]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
