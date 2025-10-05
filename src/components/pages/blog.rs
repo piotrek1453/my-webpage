@@ -59,7 +59,7 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
         },
     );
     view! {
-        <article class="overflow-hidden relative py-4 px-10 w-full max-w-full h-96 border border-black opacity-80 transition-all dark:border-white hover:shadow-lg hover:opacity-100 shadow-xs shadow-gray-400 rounded-4xl prose lg:prose-xl">
+        <article class="overflow-hidden relative py-4 px-10 w-full max-w-full max-h-96 border border-black opacity-80 transition-all dark:border-white hover:shadow-lg hover:opacity-100 shadow-xs shadow-gray-400 rounded-4xl prose lg:prose-xl">
 
             <div class="py-4 px-2 w-full max-w-full prose lg:prose-xl">
                 <h6 class="font-bold text-cyan-400 dark:text-orange-400">#{post.id}</h6>
