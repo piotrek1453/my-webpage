@@ -7,7 +7,7 @@ async fn main() {
     use my_webpage::app::*;
     use sqlx::postgres::PgPoolOptions;
     use std::env;
-    use tower_http::{services::ServeDir, trace::TraceLayer};
+    use tower_http::trace::TraceLayer;
 
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
@@ -44,7 +44,6 @@ async fn main() {
     tracing::info!("Setting up routes");
     let routes = generate_route_list(App);
     let app = Router::new()
-        .nest_service("/public", ServeDir::new("public"))
         .leptos_routes_with_context(
             &leptos_options,
             routes,
