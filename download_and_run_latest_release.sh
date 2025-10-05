@@ -8,21 +8,22 @@ mkdir -p my-webapp
 cd my-webapp
 echo "📁 Working directory: ${PWD}"
 
-# Pobierz URL do pierwszego pliku .tar.gz w assets najnowszego release’a
+# Download latest release archive
 URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" \
   | jq -r '.assets[] | select(.name | endswith(".tar.gz")) | .browser_download_url' | head -n 1)
 
 if [ -z "$URL" ]; then
-  echo "❌ Nie znaleziono żadnego pliku .tar.gz w release!"
+  echo "❌ No file found in .tar.gz in release!"
   exit 1
 fi
 
 echo "⬇️  Downloading $URL"
 curl -L "$URL" -o "$OUT"
 
-# Rozpakuj zawartość do bieżącego katalogu (bez tworzenia podkatalogu)
+# Unpack archive
 tar -xzf "$OUT"
 rm "$OUT"
 
+# Run server
 echo "🚀 Starting the server binary..."
 ./my-webpage
