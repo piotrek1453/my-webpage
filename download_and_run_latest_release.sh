@@ -4,8 +4,8 @@ set -e
 REPO="piotrek1453/my-webpage"
 OUT="release.tar.gz"
 
-mkdir -p my-webapp
-cd my-webapp
+mkdir -p my-webpage
+cd my-webpage
 echo "📁 Working directory: ${PWD}"
 
 # Download latest release archive
@@ -23,6 +23,10 @@ curl -L "$URL" -o "$OUT"
 # Unpack archive
 tar -xzf "$OUT"
 rm "$OUT"
+
+# Place correct dotenv
+echo $PWD
+cp ~/.env .env
 
 # Run server
 echo "🚀 Starting the server binary..."
