@@ -58,12 +58,24 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
             async move { parse_markdown(content).await.unwrap() }
         },
     );
+    let created_at = post
+        .created_at
+        .expect("Error reading created_at")
+        .clone()
+        .to_string();
+    let updated_at = post
+        .updated_at
+        .expect("Error reading updated_at")
+        .clone()
+        .to_string();
+
     view! {
         <article class="overflow-hidden relative py-4 px-10 w-full max-w-full max-h-96 border border-black opacity-80 transition-all dark:border-white hover:shadow-lg hover:opacity-100 shadow-xs shadow-gray-400 rounded-4xl prose lg:prose-xl">
 
             <div class="py-4 px-2 w-full max-w-full prose lg:prose-xl">
                 <h6 class="font-bold text-cyan-400 dark:text-orange-400">#{post.id}</h6>
-                <h1>{post.title.clone()}</h1>
+                <h2 class="card-title">{post.title.clone()}</h2>
+                <h6>Created at: <em>{created_at}</em>, last updated at: <em>{updated_at}</em></h6>
                 <Suspense fallback=|| {
                     view! { <p>"Parsing markdown..."</p> }
                 }>
@@ -72,7 +84,10 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
                             .get()
                             .map(|html| {
                                 view! {
-                                    <div class="mb-4 w-full max-w-full prose" inner_html=html></div>
+                                    <div
+                                        class="overflow-auto mb-4 w-full max-w-full prose"
+                                        inner_html=html
+                                    ></div>
                                 }
                             })
                     }}
