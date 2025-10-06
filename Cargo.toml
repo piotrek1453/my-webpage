@@ -60,6 +60,21 @@ hydrate = [
 ]
 time = ["dep:time"]
 
+# Build profiles: speed up debug builds, keep heavy optimizations for release
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = false
+incremental = true
+
+[profile.release]
+opt-level = 3
+debug = false
+overflow-checks = true
+lto = true
+codegen-units = 1
+panic = "abort"
+
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]
 inherits = "release"
