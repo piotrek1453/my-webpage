@@ -11,7 +11,7 @@ pub fn Blog() -> impl IntoView {
 
     view! {
         <Title title="Blog" />
-        <div class="container py-8 px-4 mx-auto">
+        <div class="container py-2 px-2 mx-auto">
             <Suspense fallback=|| {
                 view! { <p>"Loading posts..."</p> }
             }>
@@ -24,7 +24,7 @@ pub fn Blog() -> impl IntoView {
                                     view! { <p>"No posts found."</p> }.into_any()
                                 } else {
                                     view! {
-                                        <div class="space-y-6">
+                                        <div class="space-y-2">
                                             {posts_list
                                                 .into_iter()
                                                 .map(|post| view! { <BlogPostPreview post=post /> })
@@ -47,7 +47,6 @@ pub fn Blog() -> impl IntoView {
     }
 }
 
-// TODO: add displaying dates
 #[component]
 pub fn BlogPostPreview(post: Post) -> impl IntoView {
     let content_md = post.content_md.clone();
@@ -58,43 +57,82 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
             async move { parse_markdown(content).await.unwrap() }
         },
     );
-    let created_at = post
-        .created_at
-        .expect("Error reading created_at")
-        .clone()
-        .to_string();
-    let updated_at = post
-        .updated_at
-        .expect("Error reading updated_at")
-        .clone()
-        .to_string();
+
+    let (created_at, updated_at): (String, String) = {
+        #[cfg(feature = "ssr")]
+        {
+            use time::format_description;
+            let date_format = format_description::parse("[day]-[month]-[year]").unwrap();
+            (
+                post.created_at
+                    .expect("Error fetching date")
+                    .format(&date_format)
+                    .expect("Error formatting date"),
+                post.updated_at
+                    .expect("Error fetching date")
+                    .format(&date_format)
+                    .expect("Error formatting date"),
+            )
+        }
+        #[cfg(not(feature = "ssr"))]
+        {
+            (String::new(), String::new())
+        }
+    };
 
     view! {
-        <article class="overflow-hidden relative py-4 px-10 w-full max-w-full max-h-96 border border-black opacity-80 transition-all dark:border-white hover:shadow-lg hover:opacity-100 shadow-xs shadow-gray-400 rounded-4xl prose lg:prose-xl">
+        <article class="overflow-hidden relative rounded-xl border shadow-md transition-all duration-300 hover:shadow-xl card bg-base-200 border-base-300 group dark:bg-base-300 dark:border-base-content/20">
+            <div class="py-4 px-4 pb-2 space-y-1 card-body">
 
-            <div class="py-4 px-2 w-full max-w-full prose lg:prose-xl">
-                <h6 class="font-bold text-cyan-400 dark:text-orange-400">#{post.id}</h6>
-                <h2 class="card-title">{post.title.clone()}</h2>
-                <h6>Created at: <em>{created_at}</em>, last updated at: <em>{updated_at}</em></h6>
-                <Suspense fallback=|| {
-                    view! { <p>"Parsing markdown..."</p> }
-                }>
-                    {move || {
-                        html_content
-                            .get()
-                            .map(|html| {
-                                view! {
-                                    <div
-                                        class="overflow-auto mb-4 w-full max-w-full prose"
-                                        inner_html=html
-                                    ></div>
-                                }
-                            })
-                    }}
-                </Suspense>
+                <a href=post.slug target="_blank">
+
+                    // <!-- Header -->
+                    <div class="flex justify-between items-center text-xs opacity-70">
+                        <span class="font-mono text-cyan-500 dark:text-orange-400">#{post.id}</span>
+                        <span>
+                            <em>Created at: {created_at.clone()}</em>
+                            " · "
+                            <em>Updated at: {updated_at.clone()}</em>
+                        </span>
+                    </div>
+
+                    // <!-- Title -->
+                    <h2 class="text-base font-semibold leading-snug transition-colors card-title text-base-content group-hover:text-primary">
+                        {post.title.clone()}
+                    </h2>
+
+                    // <!-- Markdown preview -->
+                    <div class="relative">
+                        <Suspense fallback=|| {
+                            view! { <p class="text-sm opacity-60">"Parsing markdown..."</p> }
+                        }>
+                            {move || {
+                                html_content
+                                    .get()
+                                    .map(|html| {
+                                        view! {
+                                            <div
+                                                class="overflow-hidden relative max-w-none text-sm leading-relaxed whitespace-pre-wrap break-words prose prose-sm line-clamp-5 [&_h1]:m-0 [&_h2]:m-0 [&_h3]:m-0 [&_h4]:m-0 [&_h5]:m-0 [&_h6]:m-0 [&_p]:m-0 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 dark:prose-invert"
+                                                inner_html=html
+                                            ></div>
+                                        }
+                                    })
+                            }}
+                        </Suspense>
+
+                        // <!-- Gradient overlay + button -->
+                        <div class="absolute bottom-0 left-0 w-full h-16">
+                            <div class="absolute inset-0 bg-gradient-to-t to-transparent pointer-events-none from-base-200 dark:from-base-300"></div>
+                            <div class="flex relative z-10 justify-end pt-3 pr-2">
+                                <button class="normal-case shadow-sm btn btn-xs btn-primary sm:btn-sm">
+                                    Read more
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
             </div>
-
-            <div class="absolute bottom-0 left-0 w-full h-36 bg-gradient-to-t from-white to-transparent pointer-events-none dark:from-gray-900"></div>
         </article>
     }
 }
