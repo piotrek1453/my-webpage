@@ -25,7 +25,7 @@ tar -xzf "$OUT"
 rm "$OUT"
 
 # Place correct dotenv
-echo $PWD
+echo "$PWD"
 cp ~/.env .env
 
 # Run server

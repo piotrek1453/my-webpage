@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-leptos
+        run: cargo install cargo-leptos --locked
+
+      - name: Build (server + client assets)
+        env:
+          # cargo-leptos i tak je ustawi, ale nie zaszkodzi jawnie:
+          LEPTOS_OUTPUT_NAME: my-webpage
+          LEPTOS_SITE_ROOT: site
+          LEPTOS_SITE_PKG_DIR: pkg
+          LEPTOS_ENV: PROD
+        run: |
+          cargo leptos build --release -vv
+
+      - name: Stage bundle (root: my-webpage, .env, site/)
+        run: |
+          mkdir -p dist/stage
+          # license
+          cp LICENSE dist/stage/
+          # binary
+          cp target/release/my-webpage dist/stage/
+          # site/: WASM/JS/CSS assets
+          cp -r site dist/stage/site
+          # example.env -> .env
+          cp example.env dist/stage/.env
+          # archive
+          cd dist/stage
+          tar -czf ../my-webpage-${{ github.ref_name }}-linux-x86_64.tar.gz LICENSE my-webpage .env site
+          cd -
+
+      - name: Checksums
+        run: |
+          cd dist
+          sha256sum *.tar.gz > SHA256SUMS
+          sha512sum *.tar.gz > SHA512SUMS
+
+      - name: Create Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/my-webpage-${{ github.ref_name }}-linux-x86_64.tar.gz
+            dist/SHA256SUMS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
