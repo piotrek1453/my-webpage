@@ -26,7 +26,7 @@ jobs:
           npm --version
           node --version
           # Install DaisyUI plugin so Tailwind CLI can require it at build time
-          npm install --no-save daisyui@latest tailwindcss@latest
+          npm install --no-save daisyui@latest
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -45,7 +45,7 @@ jobs:
           LEPTOS_SITE_ROOT: site
           LEPTOS_SITE_PKG_DIR: pkg
           LEPTOS_ENV: PROD
-          LEPTOS_TAILWIND_VERSION: latest
+          LEPTOS_TAILWIND_VERSION: v4.1
           DAISYUI_VERSION: latest
         run: cargo leptos build --release -vv
 
