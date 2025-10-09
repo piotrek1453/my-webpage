@@ -39,6 +39,14 @@ jobs:
       - name: Install cargo-leptos
         run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash && cargo binstall cargo-leptos --locked --no-confirm
 
+      - name: Install sqlx-cli
+        run: cargo binstall sqlx-cli
+
+      - name: Verify SQLx cache
+        env:
+          SQLX_OFFLINE: "true"
+        run: cargo sqlx prepare -- --features ssr
+
       - name: Build (server + client assets)
         env:
           LEPTOS_OUTPUT_NAME: my-webpage
@@ -47,6 +55,7 @@ jobs:
           LEPTOS_ENV: PROD
           LEPTOS_TAILWIND_VERSION: v4.1.14
           DAISYUI_VERSION: latest
+          SQLX_OFFLINE: "true"
         run: cargo leptos build --release -vv
 
       - name: Stage bundle
