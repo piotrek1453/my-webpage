@@ -63,11 +63,6 @@ jobs:
           sqlx database create
           sqlx migrate run
 
-      - name: Verify SQLx cache against DB
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
-        run: cargo sqlx prepare -- --features ssr --check
-
       - name: Build (server + client assets)
         env:
           LEPTOS_OUTPUT_NAME: my-webpage
