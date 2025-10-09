@@ -3,12 +3,13 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
         with:
           targets: wasm32-unknown-unknown
 
@@ -28,31 +29,22 @@ jobs:
 
       - name: Build (server + client assets)
         env:
-          # cargo-leptos i tak je ustawi, ale nie zaszkodzi jawnie:
           LEPTOS_OUTPUT_NAME: my-webpage
           LEPTOS_SITE_ROOT: site
           LEPTOS_SITE_PKG_DIR: pkg
           LEPTOS_ENV: PROD
-        run: |
-          cargo leptos build --release -vv
+        run: cargo leptos build --release -vv
 
-      - name: Stage bundle (root: my-webpage, .env, site/)
+      - name: Stage bundle
         run: |
-          mkdir -p dist/stage
-          # license
-          cp LICENSE dist/stage/
-          # binary
-          cp target/release/my-webpage dist/stage/
-          # site/: WASM/JS/CSS assets
-          cp -r site dist/stage/site
-          # example.env -> .env
-          cp example.env dist/stage/.env
-          # archive
-          cd dist/stage
-          tar -czf ../my-webpage-${{ github.ref_name }}-linux-x86_64.tar.gz LICENSE my-webpage .env site
-          cd -
+          set -e
+          mkdir -p staging dist
+          cp target/release/my-webpage staging/
+          cp -r site staging/site
+          cp example.env staging/.env
+          tar -C staging -czf dist/my-webpage-${GITHUB_REF_NAME}-linux-x86_64.tar.gz my-webpage .env site
 
-      - name: Checksums
+      - name: Generate checksums
         run: |
           cd dist
           sha256sum *.tar.gz > SHA256SUMS
