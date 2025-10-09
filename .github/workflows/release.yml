@@ -45,7 +45,7 @@ jobs:
           LEPTOS_SITE_ROOT: site
           LEPTOS_SITE_PKG_DIR: pkg
           LEPTOS_ENV: PROD
-          LEPTOS_TAILWIND_VERSION: v4.1
+          LEPTOS_TAILWIND_VERSION: v4.1.14
           DAISYUI_VERSION: latest
         run: cargo leptos build --release -vv
 
