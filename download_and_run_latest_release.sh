@@ -6,6 +6,7 @@ OUT="release.tar.gz"
 
 mkdir -p my-webpage
 cd my-webpage
+rm -rf *
 echo "📁 Working directory: ${PWD}"
 
 # Download latest release archive
@@ -17,7 +18,7 @@ if [ -z "$URL" ]; then
   exit 1
 fi
 
-echo "⬇️  Downloading $URL"
+echo "⬇  Downloading $URL"
 curl -L "$URL" -o "$OUT"
 
 # Unpack archive
@@ -25,9 +26,9 @@ tar -xzf "$OUT"
 rm "$OUT"
 
 # Place correct dotenv
-echo "$PWD"
-cp ~/.env .env
+echo $PWD
+cp -f ~/.env .env
 
 # Run server
 echo "🚀 Starting the server binary..."
-./my-webpage
+./my-webpage >> ~/my-webpage.log 2>&1
