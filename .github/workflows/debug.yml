@@ -134,7 +134,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --ff-only
-          mkdir -p .metrics
+          mkdir -p .metrics docs
           if [ ! -f .metrics/sizes.csv ]; then
             echo 'timestamp,sha,bin_bytes,wasm_bytes,js_bytes,css_bytes' > .metrics/sizes.csv
           fi
@@ -146,8 +146,10 @@ jobs:
             "$JS_SIZE_BYTES" \
             "$CSS_SIZE_BYTES" >> .metrics/sizes.csv
           # Mirror to docs/ so GitHub Pages can serve it
-          mkdir -p docs
-          cp .metrics/sizes.csv docs/sizes.csv
+          if [ ! -f docs/sizes.csv ]; then
+            echo 'timestamp,sha,bin_bytes,wasm_bytes,js_bytes,css_bytes' > docs/sizes.csv
+          fi
+          tail -n +2 .metrics/sizes.csv >> docs/sizes.csv
           git add .metrics/sizes.csv docs/sizes.csv
           if git diff --cached --quiet; then
             echo "No metrics changes to commit."
