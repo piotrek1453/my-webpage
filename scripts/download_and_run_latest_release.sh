@@ -3,10 +3,11 @@ set -e
 
 REPO="piotrek1453/my-webpage"
 OUT="release.tar.gz"
+WORKDIR="/srv/www/my-webpage"
 
-mkdir -p my-webpage
-cd my-webpage
-rm -rf ./*
+mkdir -p $WORKDIR
+rm -rf "${WORKDIR:?}/"*
+cd $WORKDIR
 echo "📁 Working directory: ${PWD}"
 
 # Download latest release archive
@@ -31,4 +32,4 @@ cp -f ~/.env .env
 
 # Run server
 echo "🚀 Starting the server binary..."
-./my-webpage >> ~/my-webpage.log 2>&1
+./my-webpage >> $WORKDIR/my-webpage.log 2>&1

@@ -12,7 +12,6 @@
       canvas {
         max-width: 1100px;
         width: 100%;
-        height: 420px;
       }
       .wrap {
         max-width: 1200px;
@@ -28,36 +27,47 @@
         border-radius: 4px;
       }
     </style>
-    <script
-      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-      integrity="sha256-5Jhxg1xw6mIiMHPT+qWYL90iVOwLLwlm8+I2w3m1ZrU="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   </head>
   <body>
     <div class="wrap">
       <h1>Build artifact size trend</h1>
       <p class="legend">
-        Source: <code>docs/sizes.csv</code> (updated by CI). Values in MB.
+        Source: <code>sizes.csv</code> (updated by CI). Values in MB.
+        <a href="sizes.csv" target="_blank" rel="noopener">open CSV</a>
       </p>
       <canvas id="chart"></canvas>
     </div>
     <script>
       async function loadCSV(url) {
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to load CSV");
+        const v = Date.now();
+        const sep = url.indexOf("?") >= 0 ? "&" : "?";
+        const res = await fetch(url + sep + "v=" + v, { cache: "no-store" });
+        if (!res.ok)
+          throw new Error(
+            "Failed to load CSV (" +
+              res.status +
+              " " +
+              res.statusText +
+              ") @ " +
+              url
+          );
         const text = await res.text();
-        const lines = text.trim().split(/\r?\n/);
+        const lines = text
+          .trim()
+          .split(/\r?\n/)
+          .filter((l) => l.length);
+        if (!lines.length) return [];
         const headers = lines.shift().split(",");
         const idx = Object.fromEntries(headers.map((h, i) => [h, i]));
         const rows = lines.map((line) => line.split(","));
         return rows.map((r) => ({
           ts: new Date(r[idx.timestamp]),
           sha: r[idx.sha],
-          bin: +r[idx.bin_bytes],
-          wasm: +r[idx.wasm_bytes],
-          js: +r[idx.js_bytes],
-          css: +r[idx.css_bytes],
+          bin: Number(r[idx.bin_bytes] || 0),
+          wasm: Number(r[idx.wasm_bytes] || 0),
+          js: Number(r[idx.js_bytes] || 0),
+          css: Number(r[idx.css_bytes] || 0),
         }));
       }
       function toMB(bytes) {
@@ -65,8 +75,7 @@
       }
       (async function () {
         try {
-          const data = await loadCSV(`sizes.csv?v=${Date.now()}`);
-          // Sort by timestamp ascending
+          const data = await loadCSV("sizes.csv");
           data.sort((a, b) => a.ts - b.ts);
           const labels = data.map((d) =>
             d.ts.toISOString().slice(0, 19).replace("T", " ")
@@ -115,9 +124,12 @@
                   callbacks: {
                     title: (items) => {
                       const i = items[0].dataIndex;
-                      return `Commit ${data[i].sha.slice(0, 7)} @ ${labels[i]}`;
+                      return (
+                        "Commit " + data[i].sha.slice(0, 7) + " @ " + labels[i]
+                      );
                     },
-                    label: (c) => `${c.dataset.label}: ${c.formattedValue} MB`,
+                    label: (c) =>
+                      c.dataset.label + ": " + c.formattedValue + " MB",
                   },
                 },
               },
@@ -130,10 +142,8 @@
           new Chart(document.getElementById("chart"), cfg);
         } catch (e) {
           console.error(e);
-          document.body.insertAdjacentHTML(
-            "beforeend",
-            "<p>Failed to load sizes.csv</p>"
-          );
+          var msg = e && e.message ? e.message : "Failed to load sizes.csv";
+          document.body.insertAdjacentHTML("beforeend", "<p>" + msg + "</p>");
         }
       })();
     </script>
