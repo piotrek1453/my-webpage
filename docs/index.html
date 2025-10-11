@@ -27,10 +27,8 @@
         const repo = "my-webpage";
         const branch = "main";
         const api = `https://api.github.com/repos/${owner}/${repo}/contents/docs?ref=${branch}`;
-        const root = `${location.origin}${location.pathname.replace(
-          /\/index\.html$/,
-          ""
-        )}`;
+        // Ensure base ends with a trailing slash so relative links resolve correctly
+        const root = new URL('.', location.href).toString();
         try {
           const res = await fetch(api, {
             headers: { Accept: "application/vnd.github+json" },
