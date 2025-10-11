@@ -65,7 +65,7 @@
       }
       (async function () {
         try {
-          const data = await loadCSV("sizes.csv");
+          const data = await loadCSV(`sizes.csv?v=${Date.now()}`);
           // Sort by timestamp ascending
           data.sort((a, b) => a.ts - b.ts);
           const labels = data.map((d) =>
