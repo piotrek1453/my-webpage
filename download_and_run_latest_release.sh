@@ -6,7 +6,7 @@ OUT="release.tar.gz"
 
 mkdir -p my-webpage
 cd my-webpage
-rm -rf *
+rm -rf ./*
 echo "📁 Working directory: ${PWD}"
 
 # Download latest release archive
@@ -26,7 +26,7 @@ tar -xzf "$OUT"
 rm "$OUT"
 
 # Place correct dotenv
-echo $PWD
+echo "$PWD"
 cp -f ~/.env .env
 
 # Run server
