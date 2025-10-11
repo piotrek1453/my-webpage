@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Docs index</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 24px;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      .muted {
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Available pages</h1>
+    <p class="muted">Listing HTML files from the <code>docs/</code> folder.</p>
+    <div id="content">Loading…</div>
+    <script>
+      (async function () {
+        const owner = "piotrek1453";
+        const repo = "my-webpage";
+        const branch = "main";
+        const api = `https://api.github.com/repos/${owner}/${repo}/contents/docs?ref=${branch}`;
+        const root = `${location.origin}${location.pathname.replace(
+          /\/index\.html$/,
+          ""
+        )}`;
+        try {
+          const res = await fetch(api, {
+            headers: { Accept: "application/vnd.github+json" },
+          });
+          if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
+          const items = await res.json();
+          const htmls = items.filter(
+            (x) => x.type === "file" && x.name.endsWith(".html")
+          );
+          const el = document.getElementById("content");
+          if (htmls.length === 0) {
+            el.textContent = "No HTML files found in docs/.";
+            return;
+          }
+          // If metrics.html exists, offer a quick link first
+          const preferred = htmls.find((x) => x.name === "metrics.html");
+          const list = document.createElement("ul");
+          if (preferred) {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = new URL(preferred.name, root).toString();
+            a.textContent = preferred.name;
+            li.appendChild(a);
+            list.appendChild(li);
+          }
+          for (const x of htmls) {
+            if (preferred && x.name === preferred.name) continue;
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = new URL(x.name, root).toString();
+            a.textContent = x.name;
+            li.appendChild(a);
+            list.appendChild(li);
+          }
+          el.innerHTML = "";
+          el.appendChild(list);
+        } catch (e) {
+          console.error(e);
+          document.getElementById("content").textContent =
+            "Failed to load docs index.";
+        }
+      })();
+    </script>
+  </body>
+</html>
