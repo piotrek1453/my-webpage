@@ -1,7 +1,6 @@
 use crate::components::common::title::Title;
 use crate::models::post::Post;
-use crate::utils::content_parser::parse_markdown;
-use anyhow::Result;
+use crate::server::{markdown::parse_markdown, post::get_blogposts};
 use leptos::prelude::*;
 
 #[component]
@@ -61,18 +60,12 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
     let (created_at, updated_at): (String, String) = {
         #[cfg(feature = "ssr")]
         {
-            use time::format_description;
-            let date_format = format_description::parse("[day]-[month]-[year]").unwrap();
-            (
-                post.created_at
-                    .expect("Error fetching date")
-                    .format(&date_format)
-                    .expect("Error formatting date"),
-                post.updated_at
-                    .expect("Error fetching date")
-                    .format(&date_format)
-                    .expect("Error formatting date"),
-            )
+            let date_format = time::format_description::parse("[day]-[month]-[year]").unwrap();
+            let fmt = |dt: Option<time::OffsetDateTime>| {
+                dt.and_then(|d| d.format(&date_format).ok())
+                    .unwrap_or_else(|| "–".to_string())
+            };
+            (fmt(post.created_at), fmt(post.updated_at))
         }
         #[cfg(not(feature = "ssr"))]
         {
@@ -84,7 +77,7 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
         <article class="overflow-hidden relative rounded-xl border shadow-md transition-all duration-300 hover:shadow-xl card bg-base-200 border-base-300 group dark:bg-base-300 dark:border-base-content/20">
             <div class="py-4 px-4 pb-2 space-y-1 card-body">
 
-                <a href=post.slug target="_blank">
+                <a href=format!("/{}", post.slug.trim_start_matches('/')) target="_blank">
 
                     // <!-- Header -->
                     <div class="flex justify-between items-center text-xs opacity-70">
@@ -135,19 +128,4 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
             </div>
         </article>
     }
-}
-
-#[server]
-pub async fn get_blogposts() -> Result<Vec<Post>, ServerFnError> {
-    sqlx::query_as!(
-        Post,
-        "SELECT id, title, slug, content_md, created_at, updated_at FROM post"
-    )
-    .fetch_all(&use_context::<sqlx::Pool<sqlx::Postgres>>().ok_or_else(|| {
-        ServerFnError::<std::convert::Infallible>::ServerError(
-            "Error accessing database connection pool".into(),
-        )
-    })?)
-    .await
-    .map_err(|e| ServerFnError::ServerError(format!("Database query failed: {e}")))
 }

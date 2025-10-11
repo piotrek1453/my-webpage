@@ -1,0 +1,157 @@
+name: Debug
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.metrics/**'
+      - 'docs/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mywebpage
+        ports:
+          - '5432:5432'
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install DaisyUI (latest)
+        run: |
+          npm --version
+          node --version
+          # Install DaisyUI plugin so Tailwind CLI can require it at build time
+          npm install --no-save daisyui@latest
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-leptos
+        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash && cargo binstall cargo-leptos --locked --no-confirm
+
+      - name: Install sqlx-cli
+        run: cargo binstall sqlx-cli
+
+      - name: Initialize database (create + migrate)
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
+        run: |
+          sqlx database create
+          sqlx migrate run
+
+      - name: Build (server + client assets)
+        env:
+          LEPTOS_OUTPUT_NAME: my-webpage
+          LEPTOS_SITE_ROOT: site
+          LEPTOS_SITE_PKG_DIR: pkg
+          LEPTOS_ENV: PROD
+          LEPTOS_TAILWIND_VERSION: v4.1.14
+          DAISYUI_VERSION: latest
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
+        run: cargo leptos build --release -vv
+
+      - name: Gather artifact sizes
+        id: sizes
+        run: |
+          set -euo pipefail
+          BIN=target/release/my-webpage
+          WASM=site/pkg/my-webpage.wasm
+          JS=site/pkg/my-webpage.js
+          CSS=site/pkg/my-webpage.css
+
+          # bytes
+          bin_size=$(stat -c%s "$BIN" || echo 0)
+          wasm_size=$(stat -c%s "$WASM" || echo 0)
+          js_size=$(stat -c%s "$JS" || echo 0)
+          css_size=$(stat -c%s "$CSS" || echo 0)
+
+          # human
+          bin_h=$(du -h "$BIN" 2>/dev/null | cut -f1 || echo 0)
+          wasm_h=$(du -h "$WASM" 2>/dev/null | cut -f1 || echo 0)
+          js_h=$(du -h "$JS" 2>/dev/null | cut -f1 || echo 0)
+          css_h=$(du -h "$CSS" 2>/dev/null | cut -f1 || echo 0)
+
+          printf '{"sha":"%s","bin":%s,"wasm":%s,"js":%s,"css":%s}\n' \
+            "${GITHUB_SHA}" "$bin_size" "$wasm_size" "$js_size" "$css_size" > sizes.json
+
+          echo "BIN_SIZE_BYTES=$bin_size" >> "$GITHUB_OUTPUT"
+          echo "WASM_SIZE_BYTES=$wasm_size" >> "$GITHUB_OUTPUT"
+          echo "JS_SIZE_BYTES=$js_size" >> "$GITHUB_OUTPUT"
+          echo "CSS_SIZE_BYTES=$css_size" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Build artifact sizes"
+            echo
+            echo "Commit: $GITHUB_SHA"
+            echo
+            echo "- Binary (target/release/my-webpage): $bin_h ($bin_size bytes)"
+            echo "- WASM   (site/pkg/my-webpage.wasm): $wasm_h ($wasm_size bytes)"
+            echo "- JS     (site/pkg/my-webpage.js):  $js_h ($js_size bytes)"
+            echo "- CSS    (site/pkg/my-webpage.css): $css_h ($css_size bytes)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload size artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sizes-${{ github.sha }}
+          path: sizes.json
+
+      - name: Commit sizes to repository (metrics log)
+        env:
+          BIN_SIZE_BYTES: ${{ steps.sizes.outputs.BIN_SIZE_BYTES }}
+          WASM_SIZE_BYTES: ${{ steps.sizes.outputs.WASM_SIZE_BYTES }}
+          JS_SIZE_BYTES: ${{ steps.sizes.outputs.JS_SIZE_BYTES }}
+          CSS_SIZE_BYTES: ${{ steps.sizes.outputs.CSS_SIZE_BYTES }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --ff-only
+          mkdir -p .metrics
+          if [ ! -f .metrics/sizes.csv ]; then
+            echo 'timestamp,sha,bin_bytes,wasm_bytes,js_bytes,css_bytes' > .metrics/sizes.csv
+          fi
+          printf "%s,%s,%s,%s,%s,%s\n" \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            "$GITHUB_SHA" \
+            "$BIN_SIZE_BYTES" \
+            "$WASM_SIZE_BYTES" \
+            "$JS_SIZE_BYTES" \
+            "$CSS_SIZE_BYTES" >> .metrics/sizes.csv
+          # Mirror to docs/ so GitHub Pages can serve it
+          mkdir -p docs
+          cp .metrics/sizes.csv docs/sizes.csv
+          git add .metrics/sizes.csv docs/sizes.csv
+          if git diff --cached --quiet; then
+            echo "No metrics changes to commit."
+          else
+            git commit -m "metrics: update sizes for $GITHUB_SHA"
+            git push
+          fi

@@ -5,8 +5,7 @@ pub fn PageFooter() -> impl IntoView {
     let current_year = {
         #[cfg(feature = "ssr")]
         {
-            use time::OffsetDateTime;
-            OffsetDateTime::now_utc().year().to_string()
+            time::OffsetDateTime::now_utc().year().to_string()
         }
         #[cfg(not(feature = "ssr"))]
         {

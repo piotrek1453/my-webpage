@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use super::prelude::*;
 
 #[server]
 pub async fn parse_markdown(md: String) -> Result<String, ServerFnError> {
