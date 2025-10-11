@@ -34,9 +34,7 @@ sqlx = { version = "0.8.6", features = [
 ], optional = true }
 dotenvy = { version = "0.15.7", optional = true }
 serde = { version = "1.0.228" }
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-tokio = { version = "1", default-features = false, optional = true }
+async-trait = { version = "0.1.89", optional = true }
 
 [features]
 ssr = [
@@ -51,6 +49,7 @@ ssr = [
     "dep:sqlx",
     "dep:dotenvy",
     "dep:leptos_integration_utils",
+    "dep:async-trait",
 ]
 hydrate = [
     "leptos/hydrate",
