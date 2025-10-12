@@ -30,6 +30,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install system dependencies (clang + mold)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang mold
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
