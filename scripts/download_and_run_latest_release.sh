@@ -2,20 +2,30 @@
 set -e
 
 REPO="piotrek1453/my-webpage"
-OUT="release.tar.gz"
 WORKDIR="/srv/www/my-webpage"
+
+# Detect platform
+case "$(uname -s)" in
+  Linux*)   PLATFORM="linux-x86_64" ;;
+  FreeBSD*) PLATFORM="freebsd-x86_64" ;;
+  *)        PLATFORM="linux-x86_64" ;;
+esac
+
+TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r .tag_name)
+OUT="release.tar.gz"
+ARCHIVE="my-webpage-${TAG}-${PLATFORM}.tar.gz"
 
 mkdir -p $WORKDIR
 rm -rf "${WORKDIR:?}/"*
 cd $WORKDIR
 echo "📁 Working directory: ${PWD}"
 
-# Download latest release archive
+# Download latest release archive for detected platform
 URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" \
-  | jq -r '.assets[] | select(.name | endswith(".tar.gz")) | .browser_download_url' | head -n 1)
+  | jq -r --arg ARCHIVE "$ARCHIVE" '.assets[] | select(.name == $ARCHIVE) | .browser_download_url')
 
 if [ -z "$URL" ]; then
-  echo "❌ No file found in .tar.gz in release!"
+  echo "❌ No file found for $ARCHIVE in release!"
   exit 1
 fi
 

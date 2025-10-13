@@ -1,6 +1,3 @@
-# Apply mold linker to all Unix-like targets that use ELF, excluding macOS and Android
-# (macOS uses Mach-O and Android toolchains often lack mold by default).
-# This matches by TARGET triple (not host), so it also affects cross-compiles to Linux from other hosts.
-[target.'cfg(all(target_family = "unix", not(target_os = "macos"), not(target_os = "android")))']
-linker = "clang"
+# use mold for Linux only, when building for FreeBSD using cross it doesn't work
+[target.'cfg(target_os = "linux")']
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]

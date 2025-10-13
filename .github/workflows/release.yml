@@ -61,6 +61,9 @@ jobs:
       - name: Install sqlx-cli
         run: cargo binstall sqlx-cli
 
+      - name: Install cross for cross-compilation
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
       - name: Initialize database (create + migrate)
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
@@ -68,7 +71,7 @@ jobs:
           sqlx database create
           sqlx migrate run
 
-      - name: Build (server + client assets)
+      - name: Build for Linux (glibc)
         env:
           LEPTOS_OUTPUT_NAME: my-webpage
           LEPTOS_SITE_ROOT: site
@@ -79,7 +82,21 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
         run: cargo leptos build --release -vv
 
-      - name: Stage bundle
+      - name: Build for FreeBSD (cross)
+        env:
+          LEPTOS_OUTPUT_NAME: my-webpage
+          LEPTOS_SITE_ROOT: site
+          LEPTOS_SITE_PKG_DIR: pkg
+          LEPTOS_ENV: PROD
+          LEPTOS_TAILWIND_VERSION: v4.1.14
+          DAISYUI_VERSION: latest
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
+          LEPTOS_BIN_CARGO_COMMAND: cross
+          LEPTOS_BIN_TARGET_TRIPLE: x86_64-unknown-freebsd
+        run: |
+          cargo leptos build --release -vv
+
+      - name: Stage bundle (Linux)
         run: |
           set -e
           mkdir -p staging dist
@@ -87,6 +104,15 @@ jobs:
           cp -r site staging/site
           cp example.env staging/.env
           tar -C staging -czf dist/my-webpage-${GITHUB_REF_NAME}-linux-x86_64.tar.gz my-webpage .env site
+
+      - name: Stage bundle (FreeBSD)
+        run: |
+          set -e
+          mkdir -p staging_freebsd dist
+          cp target/x86_64-unknown-freebsd/release/my-webpage staging_freebsd/
+          cp -r site staging_freebsd/site
+          cp example.env staging_freebsd/.env
+          tar -C staging_freebsd -czf dist/my-webpage-${GITHUB_REF_NAME}-freebsd-x86_64.tar.gz my-webpage .env site
 
       - name: Generate checksums
         run: |
@@ -99,6 +125,7 @@ jobs:
         with:
           files: |
             dist/my-webpage-${{ github.ref_name }}-linux-x86_64.tar.gz
+            dist/my-webpage-${{ github.ref_name }}-freebsd-x86_64.tar.gz
             dist/SHA256SUMS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
