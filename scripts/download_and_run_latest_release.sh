@@ -43,4 +43,8 @@ cp -f ~/.env .env
 
 # Run server
 echo "🚀 Starting the server binary..."
-./my-webpage >> $WORKDIR/my-webpage.log 2>&1
+if command -v daemon >/dev/null 2>&1; then
+  /usr/sbin/daemon -f -o "$WORKDIR/my-webpage.log" "$WORKDIR/my-webpage"
+else
+  nohup "$WORKDIR/my-webpage" >> "$WORKDIR/my-webpage.log" 2>&1 &
+fi
