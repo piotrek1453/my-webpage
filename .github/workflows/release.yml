@@ -90,7 +90,8 @@ jobs:
           LEPTOS_ENV: PROD
           LEPTOS_TAILWIND_VERSION: v4.1.14
           DAISYUI_VERSION: latest
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
+          # Use Docker bridge IP so cross container can access Postgres
+          DATABASE_URL: postgres://postgres:postgres@172.17.0.1:5432/mywebpage
           LEPTOS_BIN_CARGO_COMMAND: cross
           LEPTOS_BIN_TARGET_TRIPLE: x86_64-unknown-freebsd
         run: |
