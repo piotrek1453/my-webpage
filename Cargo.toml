@@ -93,6 +93,8 @@ required-target = "wasm32-unknown-unknown"
 [package.metadata.leptos]
 # The name used by wasm-bindgen/cargo-leptos for the JS/WASM bundle. Defaults to the crate name
 output-name = "my-webpage"
+bin-cargo-command = "cross"
+bin-target-triple = "x86_64-unknown-freebsd"
 
 tailwind-input-file = "style/tailwind.css"
 
