@@ -1,5 +1,7 @@
 #!/bin/sh
 set -e
+PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin"
+export PATH
 
 REPO="piotrek1453/my-webpage"
 
