@@ -2,13 +2,12 @@
 set -e
 
 REPO="piotrek1453/my-webpage"
-WORKDIR="/srv/www/my-webpage"
 
-# Detect platform
+# Detect platform and set workdir
 case "$(uname -s)" in
-  Linux*)   PLATFORM="linux-x86_64" ;;
-  FreeBSD*) PLATFORM="freebsd-x86_64" ;;
-  *)        PLATFORM="linux-x86_64" ;;
+  Linux*)   PLATFORM="linux-x86_64"; WORKDIR="/srv/www/my-webpage" ;;
+  FreeBSD*) PLATFORM="freebsd-x86_64"; WORKDIR="/usr/local/www/my-webpage" ;;
+  *)        PLATFORM="linux-x86_64"; WORKDIR="/srv/www/my-webpage" ;;
 esac
 
 TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | jq -r .tag_name)
