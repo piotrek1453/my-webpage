@@ -10,4 +10,5 @@ passthrough = [
   "LEPTOS_JS_MINIFY",
   "LEPTOS_HASH_FILES",
   "RUSTFLAGS",
+  "SQLX_OFFLINE",
 ]

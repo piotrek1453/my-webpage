@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE post SET title=$1, slug=$2, content_md=$3 WHERE id=$4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e93e2b33cf5f859d359ea1c01f488b37cf7dfe24f6f68b8e80f3645f1414aee1"
+}
