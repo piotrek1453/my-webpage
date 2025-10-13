@@ -39,7 +39,14 @@ rm "$OUT"
 
 # Place correct dotenv
 echo "$PWD"
-cp -f ~/.env .env
+# Place correct dotenv
+echo "$PWD"
+# Resolve home dir; if ~ expands to /, use /root as fallback - for usage in rc scripts
+HOME_DIR=$(eval printf %s ~ 2>/dev/null || echo "${HOME:-}" )
+if [ -z "$HOME_DIR" ] || [ "$HOME_DIR" = "/" ]; then
+  HOME_DIR="/root"
+fi
+cp -f "$HOME_DIR/.env" .env
 
 # Run server
 echo "🚀 Starting the server binary..."
