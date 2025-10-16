@@ -6,7 +6,6 @@ async fn main() {
     use leptos_axum::{LeptosRoutes, generate_route_list};
     use my_webpage::app::*;
     use sqlx::postgres::PgPoolOptions;
-    use std::env;
     use tower_http::trace::TraceLayer;
 
     tracing_subscriber::fmt()
@@ -25,7 +24,7 @@ async fn main() {
 
     // DB setup
     tracing::info!("Setting up the database");
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url = dotenvy::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
