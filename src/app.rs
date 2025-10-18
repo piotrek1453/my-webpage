@@ -1,5 +1,5 @@
-use crate::components::common::*;
-use crate::components::pages::*;
+use crate::components::common::{bars, error_responses, footer};
+use crate::components::pages::{about, blog, contact, homepage, projects};
 
 use leptos::prelude::*;
 use leptos_meta::{MetaTags, Stylesheet, Title, provide_meta_context};

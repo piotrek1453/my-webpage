@@ -53,17 +53,24 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
         || (),
         move |_| {
             let content = content_md.clone();
-            async move { parse_markdown(content).await.unwrap() }
+            async move {
+                parse_markdown(content)
+                    .await
+                    .unwrap_or_else(|_| "<p>Error parsing markdown</p>".to_string())
+            }
         },
     );
 
     let (created_at, updated_at): (String, String) = {
         #[cfg(feature = "ssr")]
         {
-            let date_format = time::format_description::parse("[day]-[month]-[year]").unwrap();
             let fmt = |dt: Option<time::OffsetDateTime>| {
-                dt.and_then(|d| d.format(&date_format).ok())
-                    .unwrap_or_else(|| "–".to_string())
+                dt.and_then(|d| {
+                    time::format_description::parse("[day]-[month]-[year]")
+                        .ok()
+                        .and_then(|format| d.format(&format).ok())
+                })
+                .unwrap_or_else(|| "–".to_string())
             };
             (fmt(post.created_at), fmt(post.updated_at))
         }
