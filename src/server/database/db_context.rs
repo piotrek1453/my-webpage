@@ -4,6 +4,8 @@ use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 /// Global singleton for Postgres connection pool - initialized once and reused across all requests.
 static DB_CONNECTION_POOL: std::sync::OnceLock<Pool<Postgres>> = std::sync::OnceLock::new();
 
+const DEFAULT_DB_MAX_CONNECTIONS: u32 = 10;
+
 /// Universal database context for all tables/models.
 /// Provides a single access point to the database with repository pattern
 /// implemented for each of the corresponding {struct: table} pair.
@@ -37,7 +39,12 @@ impl DbContext {
             dotenvy::var("DATABASE_URL").map_err(|e| sqlx::Error::Configuration(Box::new(e)))?;
 
         let new_pool = PgPoolOptions::new()
-            .max_connections(5)
+            .max_connections(
+                dotenvy::var("DB_MAX_CONNECTIONS")
+                    .ok()
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(DEFAULT_DB_MAX_CONNECTIONS),
+            )
             .connect_lazy(&database_url)?;
 
         // Try to install the pool; ignore error if another thread won the race.
