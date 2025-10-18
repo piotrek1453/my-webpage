@@ -2,8 +2,6 @@ pub mod database;
 
 pub mod prelude {
     #[cfg(feature = "ssr")]
-    pub use super::database::repo::Repository;
-    #[cfg(feature = "ssr")]
     pub use super::database::*;
     pub use leptos::prelude::*;
     #[cfg(feature = "ssr")]
