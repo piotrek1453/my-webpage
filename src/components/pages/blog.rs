@@ -3,6 +3,10 @@ use crate::models::post::Post;
 use crate::server::{markdown::parse_markdown, post::get_blogposts};
 use leptos::prelude::*;
 
+#[cfg(feature = "ssr")]
+static DATE_FORMAT: &[time::format_description::FormatItem] =
+    time::macros::format_description!("[day]-[month]-[year]");
+
 #[component]
 pub fn Blog() -> impl IntoView {
     // Create a resource that fetches posts from the server
@@ -65,12 +69,8 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
         #[cfg(feature = "ssr")]
         {
             let fmt = |dt: Option<time::OffsetDateTime>| {
-                dt.and_then(|d| {
-                    time::format_description::parse("[day]-[month]-[year]")
-                        .ok()
-                        .and_then(|format| d.format(&format).ok())
-                })
-                .unwrap_or_else(|| "–".to_string())
+                dt.and_then(|d| d.format(&DATE_FORMAT).ok())
+                    .unwrap_or_else(|| "–".to_string())
             };
             (fmt(post.created_at), fmt(post.updated_at))
         }
