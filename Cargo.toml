@@ -53,6 +53,8 @@ ssr = [
     "dep:dotenvy",
     "dep:leptos_integration_utils",
     "dep:async-trait",
+    "dep:tracing",
+    "dep:tracing-subscriber",
 ]
 hydrate = [
     "leptos/hydrate",

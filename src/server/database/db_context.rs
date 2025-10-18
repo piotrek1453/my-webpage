@@ -1,4 +1,4 @@
-pub use crate::models::post::Post;
+use crate::models::post::Post;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 
 /// Global singleton for Postgres connection pool - initialized once and reused across all requests.
