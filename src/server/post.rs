@@ -1,17 +1,29 @@
 use super::prelude::*;
 use crate::models::post::Post;
+#[cfg(feature = "ssr")]
+use crate::server::database::db_context::DbContext;
 
 #[server]
 pub async fn get_blogposts() -> Result<Vec<Post>, ServerFnError> {
-    sqlx::query_as!(
-        Post,
-        "SELECT id, title, slug, content_md, created_at, updated_at FROM post"
-    )
-    .fetch_all(&use_context::<sqlx::Pool<sqlx::Postgres>>().ok_or_else(|| {
-        ServerFnError::<std::convert::Infallible>::ServerError(
-            "Error accessing database connection pool".into(),
-        )
-    })?)
-    .await
-    .map_err(|e| ServerFnError::ServerError(format!("Database query failed: {e}")))
+    DbContext::get()?.post.get_all().await
+}
+
+#[server]
+pub async fn get_blogpost_by_id(id: i64) -> Result<Option<Post>, ServerFnError> {
+    DbContext::get()?.post.get_by_id(id).await
+}
+
+#[server]
+pub async fn create_blogpost(post: Post) -> Result<(), ServerFnError> {
+    DbContext::get()?.post.create(post).await
+}
+
+#[server]
+pub async fn update_blogpost(post: Post) -> Result<(), ServerFnError> {
+    DbContext::get()?.post.update(post).await
+}
+
+#[server]
+pub async fn delete_blogpost(id: i64) -> Result<(), ServerFnError> {
+    DbContext::get()?.post.delete(id).await
 }

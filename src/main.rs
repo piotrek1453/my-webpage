@@ -1,3 +1,8 @@
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::panic)]
+#![deny(clippy::expect_used)]
+#![deny(unused_must_use)]
+
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
