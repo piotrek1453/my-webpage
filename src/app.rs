@@ -49,7 +49,7 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("projects") view=projects::Projects />
                     <Route path=StaticSegment("blog") view=blog::Blog />
                     <Route
-                        path=(StaticSegment("blog/post"), ParamSegment("slug"))
+                        path=(StaticSegment("blog"), StaticSegment("post"), ParamSegment("slug"))
                         view=blog::BlogPost
                     />
                     <Route path=StaticSegment("about") view=about::About />

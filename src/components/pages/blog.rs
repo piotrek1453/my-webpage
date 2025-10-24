@@ -85,7 +85,7 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
         <article class="overflow-hidden relative rounded-xl border shadow-md transition-all duration-300 hover:shadow-xl card bg-base-200 border-base-300 group dark:bg-base-300 dark:border-base-content/20">
             <div class="py-4 px-4 pb-2 space-y-1 card-body">
 
-                <a href=format!("/{}", post.slug.trim_start_matches('/')) target="_blank">
+                <a href=format!("/blog/post/{}", post.slug.trim_start_matches('/')) target="_blank">
 
                     // <!-- Header -->
                     <div class="flex justify-between items-center text-xs opacity-70">
@@ -153,8 +153,11 @@ pub fn BlogPost() -> impl IntoView {
             {move || match post.get() {
                 Some(Some(post)) => {
                     view! {
-                        <article>
-                            <h1>{post.title}</h1>
+                        <article class="overflow-hidden relative prose">
+                            <div class="py-4 px-2 mx-auto max-w-none whitespace-pre-wrap break-words centered-content dark:prose-invert">
+                                <h1>{post.title}</h1>
+                                <p>{post.content_md}</p>
+                            </div>
                         </article>
                     }
                         .into_any()
