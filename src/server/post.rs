@@ -11,6 +11,12 @@ pub async fn get_blogposts() -> Result<Vec<Post>, ServerFnError> {
 }
 
 #[server]
+pub async fn get_blogpost_by_slug(slug: String) -> Result<Option<Post>, ServerFnError> {
+    let ctx = DbContext::get().await?;
+    Ok(ctx.post.get_by_slug(slug).await?)
+}
+
+#[server]
 pub async fn get_blogpost_by_id(id: i64) -> Result<Option<Post>, ServerFnError> {
     let ctx = DbContext::get().await?;
     Ok(ctx.post.get_by_id(id).await?)

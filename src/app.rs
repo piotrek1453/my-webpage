@@ -4,7 +4,7 @@ use crate::components::pages::{about, blog, contact, homepage, projects};
 use leptos::prelude::*;
 use leptos_meta::{MetaTags, Stylesheet, Title, provide_meta_context};
 use leptos_router::{
-    StaticSegment,
+    ParamSegment, StaticSegment,
     components::{Route, Router, Routes},
 };
 
@@ -45,11 +45,15 @@ pub fn App() -> impl IntoView {
         <Router>
             <main>
                 <Routes fallback=|| error_responses::PageNotFound()>
-                    <Route path=StaticSegment("/") view=homepage::HomePage />
-                    <Route path=StaticSegment("/projects") view=projects::Projects />
-                    <Route path=StaticSegment("/blog") view=blog::Blog />
-                    <Route path=StaticSegment("/about") view=about::About />
-                    <Route path=StaticSegment("/contact") view=contact::Contact />
+                    <Route path=StaticSegment("") view=homepage::HomePage />
+                    <Route path=StaticSegment("projects") view=projects::Projects />
+                    <Route path=StaticSegment("blog") view=blog::Blog />
+                    <Route
+                        path=(StaticSegment("blog/post"), ParamSegment("slug"))
+                        view=blog::BlogPost
+                    />
+                    <Route path=StaticSegment("about") view=about::About />
+                    <Route path=StaticSegment("contact") view=contact::Contact />
                 </Routes>
             </main>
         </Router>

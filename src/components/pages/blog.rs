@@ -1,7 +1,8 @@
 use crate::components::common::title::Title;
 use crate::models::post::Post;
-use crate::server::{markdown::parse_markdown, post::get_blogposts};
+use crate::server::{markdown::parse_markdown, post::get_blogpost_by_slug, post::get_blogposts};
 use leptos::prelude::*;
+use leptos_router::hooks::use_params_map;
 
 #[cfg(feature = "ssr")]
 static DATE_FORMAT: &[time::format_description::FormatItem] =
@@ -134,5 +135,41 @@ pub fn BlogPostPreview(post: Post) -> impl IntoView {
 
             </div>
         </article>
+    }
+}
+
+#[component]
+pub fn BlogPost() -> impl IntoView {
+    let params = use_params_map();
+    let slug = move || params.with(|p| p.get("slug").unwrap_or_default());
+    let post = Resource::new(slug, |slug| async move {
+        get_blogpost_by_slug(slug).await.ok().flatten()
+    });
+    view! {
+        <Suspense fallback=move || {
+            view! { <p>Loading...</p> }
+        }>
+
+            {move || match post.get() {
+                Some(Some(post)) => {
+                    view! {
+                        <article>
+                            <h1>{post.title}</h1>
+                        </article>
+                    }
+                        .into_any()
+                }
+                Some(None) => {
+
+                    view! { <p>Post not found</p> }
+                        .into_any()
+                }
+                None => {
+
+                    view! { <p>Loading...</p> }
+                        .into_any()
+                }
+            }}
+        </Suspense>
     }
 }

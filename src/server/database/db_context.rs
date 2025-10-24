@@ -108,6 +108,16 @@ impl PostRepository {
         .await
     }
 
+    pub async fn get_by_slug(&self, slug: String) -> Result<Option<Post>, sqlx::Error> {
+        sqlx::query_as!(
+            Post,
+            r#"SELECT id, title, slug, content_md, created_at, updated_at FROM post WHERE slug=$1"#,
+            slug
+        )
+        .fetch_optional(self.pool)
+        .await
+    }
+
     pub async fn create(&self, post: Post) -> Result<(), sqlx::Error> {
         sqlx::query!(
             r#"INSERT INTO post (title, slug, content_md) VALUES ($1, $2, $3)"#,
