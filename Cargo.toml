@@ -38,6 +38,8 @@ serde = { version = "1.0.229" }
 async-trait = { version = "0.1.91", optional = true }
 
 [features]
+default = ["time"]
+
 ssr = [
     "dep:axum",
     "dep:tokio",

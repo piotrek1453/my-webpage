@@ -30,6 +30,7 @@ RUN apk add --no-cache \
     clang \
     llvm \
     mold \
+    postgresql \
     binutils && \
     npm i -g pnpm && \
     adduser -D vscode -s /usr/bin/fish && \
@@ -59,7 +60,7 @@ COPY --from=cacher /usr/local/cargo /usr/local/cargo
 RUN cargo leptos build --release
 
 FROM base AS dev
-RUN RUSTFLAGS="" cargo install leptosfmt
+RUN RUSTFLAGS="" cargo install leptosfmt sqlx-cli
 COPY --chown=vscode:vscode . .
 ENV LEPTOS_ENV=development \
     RUST_LOG=info

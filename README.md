@@ -33,6 +33,69 @@ If you don't want to host using cargo leptos and prefer to call the binary direc
         └── my-webpage.wasm
 ```
 
+# Quick dev setup
+
+make sure you have Postgres installed locally for example like this on Arch
+
+```
+sudo pacman -S postgresql
+systemctl enable --now postgresql.service
+```
+
+next login to postgres user, initialize DB and set password
+
+```
+sudo -i -u postgres
+psql
+initDB -D /var/lib/postgres/data
+ALTER USER postgres PASSWORD '<PASSWORD>';
+```
+
+make sure DB is reachable from container: set listen_addresses to '*' (easiest) in /var/lib/postgres/data/postgresql.conf and in pg_hba.conf append line like:
+
+```
+host    all    all    10.140.131.0/24    scram-sha-256
+```
+
+exact ip and mask can be found by trying to run in container 
+
+```
+psql -h host.containers.internal -U postgres -d <DB_NAME>
+```
+
+error will show the exact ip
+
+with that you can also find podman net address and mask with 
+
+```
+ip route
+```
+
+on localhost
+
+
+next make sure you have .env file in root of repo, example is in example.env. without it container build will fail
+
+inside the file set DB access settings with DATABASE_URL. if used in Podman container can be done like this
+
+```
+DATABASE_URL=postgres://postgres:<PASSWORD>@host.containers.internal:5432/<DB_NAME>
+```
+
+then run migration with
+
+```
+sqlx migrate run
+```
+
+after that you can build and run for example with
+
+```
+cargo leptos watch
+```
+
+and the app should connect to DB in Postgres instance on localhost.
+
 ## Useful resources
 - [Leptos book](https://book.leptos.dev/),
 - [start-axum project template](https://github.com/leptos-rs/start-axum),
