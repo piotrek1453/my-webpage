@@ -32,7 +32,9 @@
         "qwtel.sqlite-viewer",
         "bradlc.vscode-tailwindcss",
         "phu1237.vs-browser",
-        "ms-azuretools.vscode-containers"
+        "ms-azuretools.vscode-containers",
+        "docker.docker",
+        "fill-labs.dependi"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "fish",
