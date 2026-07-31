@@ -35,6 +35,9 @@ If you don't want to host using cargo leptos and prefer to call the binary direc
 
 # Quick dev setup
 
+If you use the development container built from the Dockerfile, PostgreSQL starts automatically inside the container and `DATABASE_URL` defaults to `postgres://postgres@127.0.0.1:5432/mywebpage`.
+The manual steps below are for running the app outside that container.
+
 make sure you have Postgres installed locally for example like this on Arch
 
 ```
@@ -76,7 +79,17 @@ on localhost
 
 next make sure you have .env file in root of repo, example is in example.env. without it container build will fail
 
-inside the file set DB access settings with DATABASE_URL. if used in Podman container can be done like this
+If you are using the development container described by the `Dockerfile`, you do NOT need to edit the database settings — simply copy `example.env` to `.env` and the container will start a local PostgreSQL instance automatically. The dev container sets `DATABASE_URL` to `postgres://postgres@127.0.0.1:5432/mywebpage` by default.
+
+Quick commands to prepare and run the dev container locally:
+
+```bash
+cp example.env .env
+docker build -t my-webpage-dev -f Dockerfile .
+docker run --rm -p 8080:8080 -v "$PWD":/app my-webpage-dev
+```
+
+If you are running the app outside the dev container, set `DATABASE_URL` in `.env` to point to your Postgres instance, for example:
 
 ```
 DATABASE_URL=postgres://postgres:<PASSWORD>@host.containers.internal:5432/<DB_NAME>
