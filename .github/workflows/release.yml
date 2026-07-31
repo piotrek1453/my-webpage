@@ -33,12 +33,12 @@ jobs:
       - name: Install system dependencies (clang + mold)
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang mold
+          sudo apt-get install -y clang mold postgresql-client
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install DaisyUI (latest)
         run: |
@@ -59,20 +59,27 @@ jobs:
         run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash && cargo binstall cargo-leptos --locked --no-confirm
 
       - name: Install sqlx-cli
-        run: cargo binstall sqlx-cli --locked --no-confirm
+        run: cargo install sqlx-cli --version 0.9.0 --locked
 
       - name: Ensure cargo binaries are on PATH
         run: echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
-      - name: Install cross for cross-compilation
-        run: cargo install cross --git https://github.com/cross-rs/cross
-
-      - name: Initialize database (create + migrate)
+      - name: Wait for Postgres
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
         run: |
-          sqlx database create
-          sqlx migrate run
+          until pg_isready -h localhost -p 5432 -U postgres >/dev/null 2>&1; do
+            sleep 1
+          done
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
+        run: |
+          "$HOME/.cargo/bin/sqlx" migrate run --source ./migrations
+
+      - name: Install cross for cross-compilation
+        run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build for Linux (glibc)
         env:
