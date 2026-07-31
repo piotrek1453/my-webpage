@@ -63,7 +63,10 @@ jobs:
         run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash && cargo binstall cargo-leptos --locked --no-confirm
 
       - name: Install sqlx-cli
-        run: cargo binstall sqlx-cli
+        run: cargo binstall sqlx-cli --locked --no-confirm
+
+      - name: Ensure cargo binaries are on PATH
+        run: echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Initialize database (create + migrate)
         env:
