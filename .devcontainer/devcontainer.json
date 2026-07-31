@@ -3,10 +3,7 @@
   "build": {
     "dockerfile": "../Dockerfile",
     "target": "dev",
-    "context": "..",
-    "args": {
-      "LEPTOS_ENV": "development"
-    }
+    "context": ".."
   },
   // don't forget to change the port here to match one from LEPTOS_SITE_ADDR defined in .env file
   "forwardPorts": [

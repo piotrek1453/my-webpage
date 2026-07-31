@@ -80,7 +80,6 @@ jobs:
           LEPTOS_OUTPUT_NAME: my-webpage
           LEPTOS_SITE_ROOT: site
           LEPTOS_SITE_PKG_DIR: pkg
-          LEPTOS_ENV: PROD
           LEPTOS_TAILWIND_VERSION: v4.1.14
           DAISYUI_VERSION: latest
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage

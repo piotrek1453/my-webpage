@@ -63,8 +63,7 @@ FROM base AS dev
 RUN RUSTFLAGS="" cargo install leptosfmt sqlx-cli
 COPY --chown=vscode:vscode . .
 RUN chmod +x scripts/dev-entrypoint.sh
-ENV LEPTOS_ENV=development \
-    RUST_LOG=info \
+ENV RUST_LOG=info \
     PGDATA=/tmp/my-webpage-postgres \
     DATABASE_URL=postgres://postgres@127.0.0.1:5432/mywebpage
 EXPOSE 8080
