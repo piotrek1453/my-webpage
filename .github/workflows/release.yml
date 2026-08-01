@@ -56,13 +56,18 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Install cargo-leptos
-        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash && cargo binstall cargo-leptos --locked --no-confirm
+        run: |
+          set -euo pipefail
+          cargo install cargo-leptos --locked --force
+          "$HOME/.cargo/bin/cargo-leptos" --version
 
       - name: Install sqlx-cli
         run: cargo install sqlx-cli --version 0.9.0 --locked
 
       - name: Ensure cargo binaries are on PATH
-        run: echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+        run: |
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "PATH=$HOME/.cargo/bin:$PATH" >> "$GITHUB_ENV"
 
       - name: Wait for Postgres
         env:
@@ -90,7 +95,9 @@ jobs:
           DAISYUI_VERSION: latest
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/mywebpage
           RUST_BACKTRACE: full
-        run: cargo leptos build --release -vv
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo leptos build --release -vv
 
       - name: Build for FreeBSD (cross)
         env:
@@ -104,6 +111,7 @@ jobs:
           LEPTOS_BIN_TARGET_TRIPLE: x86_64-unknown-freebsd
           RUST_BACKTRACE: full
         run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
           cargo leptos build --release -vv
 
       - name: Stage bundle (Linux)
